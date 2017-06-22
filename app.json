@@ -1,6 +1,6 @@
 {
-  "name": "Start on Heroku: Go",
-  "description": "Go Getting Started Example App",
+  "name": "YTSync",
+  "description": "YouTube Syncer that allows user to download new liked videos on YouTube",
   "keywords": [
     "getting-started",
     "go",
@@ -8,7 +8,7 @@
     "example"
   ],
   "image": "heroku/go:1.6",
-  "mount_dir": "src/github.com/heroku/go-getting-started",
-  "website": "http://github.com/heroku/go-getting-started",
-  "repository": "http://github.com/heroku/go-getting-started"
+  "mount_dir": "src/com/nclandrei/ytsync",
+  "website": "http://github.com/nclandrei/ytsync",
+  "repository": "http://github.com/nclandrei/ytsync"
 }
