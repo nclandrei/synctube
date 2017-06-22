@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-MAINTAINER Edward Muller <a.mihai.nicolae@gmail.com>
+MAINTAINER Andrei-Mihai Nicolae <a.mihai.nicolae@gmail.com>
 
 WORKDIR "/opt"
 
@@ -9,4 +9,3 @@ ADD ./templates /opt/templates
 ADD ./static /opt/static
 
 CMD ["/opt/bin/ytsync"]
-

@@ -2,10 +2,8 @@
   "name": "YTSync",
   "description": "YouTube Syncer that allows user to download new liked videos on YouTube",
   "keywords": [
-    "getting-started",
-    "go",
-    "sample",
-    "example"
+    "youtube",
+    "go"
   ],
   "image": "heroku/go:1.6",
   "mount_dir": "src/com/nclandrei/ytsync",
