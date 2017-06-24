@@ -33,7 +33,7 @@
 		"Hostname": "",
 		"UseHTTP": true,
 		"UseHTTPS": false,
-		"HTTPPort": 80,
+		"HTTPPort": 4321,
 		"HTTPSPort": 443,
 		"CertFile": "tls/server.crt",
 		"KeyFile": "tls/server.key"
