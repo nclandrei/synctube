@@ -1,10 +1,10 @@
 {
 	"Database": {
-		"Type": "Bolt",
+		"Type": "MongoDB",
 		"MongoDB": {
 			"URL": "127.0.0.1",
-			"Database": "gowebapp"
-		},
+			"Database": "ytsync-db"
+		}
 	},
 	"Email": {
 		"Username": "",
