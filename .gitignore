@@ -1,8 +1,0 @@
-.env
-.docker_build/
-.idea/*
-.idea/go-getting-started.iml
-.idea/libraries/
-.idea/modules.xml
-.idea/workspace.xml
-.idea/
