@@ -33,14 +33,24 @@
 	{{CSS "static/css/bootstrap.min.css"}}
 	{{CSS "//fonts.googleapis.com/css?family=Montserrat:400,700,200"}}
 	{{CSS "static/css/now-ui-kit.css"}}
-	{{CSS "static/css/global.css"}}
+	<!--{{CSS "static/css/global.css"}}-->
 
 	{{template "head" .}}
   </head>
-  <body class="index-page">
+  <body>
 
-    <!--<nav class="navbar navbar-inverse navbar-static-top">-->
-      <!--<div class="container-fluid">-->
+    <nav class="navbar navbar navbar-toggleable-md bg-primary fixed-top">
+      <div class="container">
+		  <div class="navbar-translate">
+		  <!--<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">-->
+		  <!--<span class="navbar-toggler-bar bar1"></span>-->
+		  <!--<span class="navbar-toggler-bar bar2"></span>-->
+		  <!--<span class="navbar-toggler-bar bar3"></span>-->
+		  <!--</button>-->
+		  <a class="navbar-brand" href="{{.BaseURI}}" rel="tooltip" title="Designed by Invision. Coded by Creative Tim" data-placement="bottom" target="_blank">
+		  	YouTubeSync
+		  </a>
+		  </div>
         <!--<div class="navbar-header">-->
           <!--<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">-->
             <!--<span class="sr-only">Toggle navigation</span>-->
@@ -48,62 +58,62 @@
             <!--<span class="icon-bar"></span>-->
             <!--<span class="icon-bar"></span>-->
           <!--</button>-->
-          <!--<a class="navbar-brand" href="{{.BaseURI}}">Go Web App</a>-->
+          <!--<a class="navbar-brand" data-placement="bottom" href="{{.BaseURI}}">Go Web App</a>-->
         <!--</div>-->
-        <!--<div id="navbar" class="navbar-collapse collapse">-->
-		  <!--{{template "menu.tmpl" .}}-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</nav>-->
 
-	<nav class="navbar navbar-toggleable-md bg-primary fixed-top">
-		<div class="container">
-			<div class="navbar-translate">
-				<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-bar bar1"></span>
-					<span class="navbar-toggler-bar bar2"></span>
-					<span class="navbar-toggler-bar bar3"></span>
-				</button>
-				<a class="navbar-brand" href="http://demos.creative-tim.com/now-ui-kit/index.html" rel="tooltip" title="Designed by Invision. Coded by Creative Tim" data-placement="bottom" target="_blank">
-					Now Ui Kit
-				</a>
-			</div>
-			<div class="collapse navbar-collapse justify-content-end" id="navigation" data-nav-image="./assets/img/blurred-image-1.jpg">
-				<ul class="navbar-nav">
-					<li class="nav-item">
-						<a class="nav-link" href="javascript:void(0)" onclick="scrollToDownload()">
-							<i class="now-ui-icons arrows-1_cloud-download-93"></i>
-							<p>Download</p>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="./documentation/tutorial-components.html" target="_blank">
-							<i class="now-ui-icons files_paper"></i>
-							<p>Components</p>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" rel="tooltip" title="Follow us on Twitter" data-placement="bottom" href="https://twitter.com/CreativeTim" target="_blank">
-							<i class="fa fa-twitter"></i>
-							<p class="hidden-lg-up">Twitter</p>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" rel="tooltip" title="Like us on Facebook" data-placement="bottom" href="https://www.facebook.com/CreativeTim" target="_blank">
-							<i class="fa fa-facebook-square"></i>
-							<p class="hidden-lg-up">Facebook</p>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" rel="tooltip" title="Follow us on Instagram" data-placement="bottom" href="https://www.instagram.com/CreativeTimOfficial" target="_blank">
-							<i class="fa fa-instagram"></i>
-							<p class="hidden-lg-up">Instagram</p>
-						</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</nav>
+		  <div class="collapse navbar-collapse justify-content-end" id="navigation" data-nav-image="../assets/img/blurred-image-1.jpg">
+			  {{template "menu.tmpl" .}}
+		  </div>
+      </div>
+    </nav>
+
+	<!-- Navbar -->
+	<!--<nav class="navbar navbar-toggleable-md bg-primary fixed-top " color-on-scroll="500">-->
+		<!--<div class="container">-->
+			<!--<div class="navbar-translate">-->
+				<!--<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">-->
+					<!--<span class="navbar-toggler-bar bar1"></span>-->
+					<!--<span class="navbar-toggler-bar bar2"></span>-->
+					<!--<span class="navbar-toggler-bar bar3"></span>-->
+				<!--</button>-->
+				<!--<a class="navbar-brand" href="http://demos.creative-tim.com/now-ui-kit/index.html" rel="tooltip" title="Designed by Invision. Coded by Creative Tim" data-placement="bottom" target="_blank">-->
+					<!--Now Ui Kit-->
+				<!--</a>-->
+			<!--</div>-->
+			<!--<div class="collapse navbar-collapse justify-content-end" id="navigation" data-nav-image="../assets/img/blurred-image-1.jpg">-->
+				<!--<ul class="navbar-nav">-->
+					<!--<li class="nav-item">-->
+						<!--<a class="nav-link" href="#pablo">-->
+							<!--<p>Link</p>-->
+						<!--</a>-->
+					<!--</li>-->
+					<!--<li class="nav-item">-->
+						<!--<a class="nav-link" href="#pablo">-->
+							<!--<p>Link</p>-->
+						<!--</a>-->
+					<!--</li>-->
+					<!--<li class="nav-item">-->
+						<!--<a class="nav-link" rel="tooltip" title="Follow us on Twitter" data-placement="bottom" href="https://twitter.com/CreativeTim" target="_blank">-->
+							<!--<i class="fa fa-twitter"></i>-->
+							<!--<p class="hidden-lg-up">Twitter</p>-->
+						<!--</a>-->
+					<!--</li>-->
+					<!--<li class="nav-item">-->
+						<!--<a class="nav-link" rel="tooltip" title="Like us on Facebook" data-placement="bottom" href="https://www.facebook.com/CreativeTim" target="_blank">-->
+							<!--<i class="fa fa-facebook-square"></i>-->
+							<!--<p class="hidden-lg-up">Facebook</p>-->
+						<!--</a>-->
+					<!--</li>-->
+					<!--<li class="nav-item">-->
+						<!--<a class="nav-link" rel="tooltip" title="Follow us on Instagram" data-placement="bottom" href="https://www.instagram.com/CreativeTimOfficial" target="_blank">-->
+							<!--<i class="fa fa-instagram"></i>-->
+							<!--<p class="hidden-lg-up">Instagram</p>-->
+						<!--</a>-->
+					<!--</li>-->
+				<!--</ul>-->
+			<!--</div>-->
+		<!--</div>-->
+	<!--</nav>-->
 
 
 	<input id="BaseURI" type="hidden" value="{{.BaseURI}}">
@@ -118,7 +128,7 @@
 
 	{{template "content" .}}
 	
-	{{JS "static/js/core/jquery1.11.0.min.js"}}
+	{{JS "static/js/core/jquery-3.2.1.min.js"}}
 	{{JS "static/js/plugins/underscore-min.js"}}
 	{{JS "static/js/core/bootstrap.min.js"}}
 	{{JS "static/js/global.js"}}
@@ -128,18 +138,6 @@
 	{{JS "static/js/plugins/bootstrap-datepicker.js"}}
 	{{JS "static/js/core/now-ui-kit.js"}}
 
-	<script type="text/javascript">
-        $(document).ready(function() {
-            nowuiKit.initSliders();
-        });
-        function scrollToDownload() {
-            if ($('.section-download').length !== 0) {
-                $("html, body").animate({
-                    scrollTop: $('.section-download').offset().top
-                }, 1000);
-            }
-        }
-	</script>
 	{{template "foot" .}}
   </body>
 </html>
