@@ -15,6 +15,7 @@ import (
 	"app/shared/session"
 	"app/shared/view"
 	"app/shared/view/plugin"
+	"app/shared/youtube"
 )
 
 // *****************************************************************************
@@ -71,6 +72,7 @@ type configuration struct {
 	Session   session.Session `json:"Session"`
 	Template  view.Template   `json:"Template"`
 	View      view.View       `json:"View"`
+	YouTube   youtube.YouTube `json:"YouTube"`
 }
 
 // ParseJSON unmarshals bytes to structs
