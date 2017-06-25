@@ -106,7 +106,7 @@ func routes() *httprouter.Router {
 		ThenFunc(controller.NotepadDeleteGET)))
 
 	// YouTube
-	r.GET("/youtube", hr.Handler(alice.
+	r.GET("/youtube-sync", hr.Handler(alice.
 		New(acl.DisallowAnon).
 		ThenFunc(controller.YouTubeGET)))
 

@@ -1,4 +1,4 @@
-package youtube
+package youtube_sync
 
 import (
 	"log"
@@ -72,7 +72,7 @@ func tokenCacheFile() (string, error) {
 	tokenCacheDir := filepath.Join(usr.HomeDir, ".credentials")
 	os.MkdirAll(tokenCacheDir, 0700)
 	return filepath.Join(tokenCacheDir,
-		url.QueryEscape("youtube-go-quickstart.json")), err
+		url.QueryEscape("youtube-sync-go-quickstart.json")), err
 }
 
 // tokenFromFile retrieves a Token from a given file path.
@@ -123,23 +123,5 @@ func channelsListByUsername(service *youtube.Service, part string, forUsername s
 
 
 func main() {
-	ctx := context.Background()
 
-	b, err := ioutil.ReadFile("client_secret.json")
-	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-	}
-
-	// If modifying these scopes, delete your previously saved credentials
-	// at ~/.credentials/youtube-go-quickstart.json
-	config, err := google.ConfigFromJSON(b, youtube.YoutubeReadonlyScope)
-	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
-	}
-	client := getClient(ctx, config)
-	service, err := youtube.New(client)
-
-	handleError(err, "Error creating YouTube client")
-
-	channelsListByUsername(service, "snippet,contentDetails,statistics", "GoogleDevelopers")
 }
