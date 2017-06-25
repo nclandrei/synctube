@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
+
 	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-	<meta name="description" content=""> 
+	<meta name="description" content="">
 	<meta name="keywords" content="">
-	<meta name="author" content="nclandrei">
+	<meta name="author" content="">
 
 	<title>{{template "title" .}}</title>
-	
+
+	<!-- Favicons from http://realfavicongenerator.net -->
 	<link rel="apple-touch-icon" sizes="57x57" href="/static/favicons/apple-touch-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="114x114" href="/static/favicons/apple-touch-icon-114x114.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="/static/favicons/apple-touch-icon-72x72.png">
@@ -25,119 +26,59 @@
 	<link rel="icon" type="image/png" href="/static/favicons/favicon-96x96.png" sizes="96x96">
 	<link rel="icon" type="image/png" href="/static/favicons/favicon-16x16.png" sizes="16x16">
 	<link rel="icon" type="image/png" href="/static/favicons/favicon-32x32.png" sizes="32x32">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
 	<meta name="msapplication-TileColor" content="#da532c">
 	<meta name="msapplication-TileImage" content="/static/favicons/mstile-144x144.png">
 
 	{{CSS "static/css/bootstrap.min.css"}}
-	{{CSS "//fonts.googleapis.com/css?family=Montserrat:400,700,200"}}
-	{{CSS "static/css/now-ui-kit.css"}}
-	<!--{{CSS "static/css/global.css"}}-->
+	{{CSS "//fonts.googleapis.com/css?family=Open+Sans:300,400,bold,italic"}}
+	{{CSS "static/css/global.css"}}
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="//oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
+	<script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
 
 	{{template "head" .}}
-  </head>
-  <body>
+</head>
+<body>
 
-    <nav class="navbar navbar navbar-toggleable-md bg-primary fixed-top">
-      <div class="container">
-		  <div class="navbar-translate">
-		  <!--<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">-->
-		  <!--<span class="navbar-toggler-bar bar1"></span>-->
-		  <!--<span class="navbar-toggler-bar bar2"></span>-->
-		  <!--<span class="navbar-toggler-bar bar3"></span>-->
-		  <!--</button>-->
-		  <a class="navbar-brand" href="{{.BaseURI}}" rel="tooltip" title="Designed by Invision. Coded by Creative Tim" data-placement="bottom" target="_blank">
-		  	YouTubeSync
-		  </a>
-		  </div>
-        <!--<div class="navbar-header">-->
-          <!--<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">-->
-            <!--<span class="sr-only">Toggle navigation</span>-->
-            <!--<span class="icon-bar"></span>-->
-            <!--<span class="icon-bar"></span>-->
-            <!--<span class="icon-bar"></span>-->
-          <!--</button>-->
-          <!--<a class="navbar-brand" data-placement="bottom" href="{{.BaseURI}}">Go Web App</a>-->
-        <!--</div>-->
+<nav class="navbar navbar-inverse navbar-static-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="{{.BaseURI}}">Go Web App</a>
+		</div>
+		<div id="navbar" class="navbar-collapse collapse">
+			{{template "menu.tmpl" .}}
+		</div>
+	</div>
+</nav>
 
-		  <div class="collapse navbar-collapse justify-content-end" id="navigation" data-nav-image="../assets/img/blurred-image-1.jpg">
-			  {{template "menu.tmpl" .}}
-		  </div>
-      </div>
-    </nav>
-
-	<!-- Navbar -->
-	<!--<nav class="navbar navbar-toggleable-md bg-primary fixed-top " color-on-scroll="500">-->
-		<!--<div class="container">-->
-			<!--<div class="navbar-translate">-->
-				<!--<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">-->
-					<!--<span class="navbar-toggler-bar bar1"></span>-->
-					<!--<span class="navbar-toggler-bar bar2"></span>-->
-					<!--<span class="navbar-toggler-bar bar3"></span>-->
-				<!--</button>-->
-				<!--<a class="navbar-brand" href="http://demos.creative-tim.com/now-ui-kit/index.html" rel="tooltip" title="Designed by Invision. Coded by Creative Tim" data-placement="bottom" target="_blank">-->
-					<!--Now Ui Kit-->
-				<!--</a>-->
-			<!--</div>-->
-			<!--<div class="collapse navbar-collapse justify-content-end" id="navigation" data-nav-image="../assets/img/blurred-image-1.jpg">-->
-				<!--<ul class="navbar-nav">-->
-					<!--<li class="nav-item">-->
-						<!--<a class="nav-link" href="#pablo">-->
-							<!--<p>Link</p>-->
-						<!--</a>-->
-					<!--</li>-->
-					<!--<li class="nav-item">-->
-						<!--<a class="nav-link" href="#pablo">-->
-							<!--<p>Link</p>-->
-						<!--</a>-->
-					<!--</li>-->
-					<!--<li class="nav-item">-->
-						<!--<a class="nav-link" rel="tooltip" title="Follow us on Twitter" data-placement="bottom" href="https://twitter.com/CreativeTim" target="_blank">-->
-							<!--<i class="fa fa-twitter"></i>-->
-							<!--<p class="hidden-lg-up">Twitter</p>-->
-						<!--</a>-->
-					<!--</li>-->
-					<!--<li class="nav-item">-->
-						<!--<a class="nav-link" rel="tooltip" title="Like us on Facebook" data-placement="bottom" href="https://www.facebook.com/CreativeTim" target="_blank">-->
-							<!--<i class="fa fa-facebook-square"></i>-->
-							<!--<p class="hidden-lg-up">Facebook</p>-->
-						<!--</a>-->
-					<!--</li>-->
-					<!--<li class="nav-item">-->
-						<!--<a class="nav-link" rel="tooltip" title="Follow us on Instagram" data-placement="bottom" href="https://www.instagram.com/CreativeTimOfficial" target="_blank">-->
-							<!--<i class="fa fa-instagram"></i>-->
-							<!--<p class="hidden-lg-up">Instagram</p>-->
-						<!--</a>-->
-					<!--</li>-->
-				<!--</ul>-->
-			<!--</div>-->
-		<!--</div>-->
-	<!--</nav>-->
-
-
-	<input id="BaseURI" type="hidden" value="{{.BaseURI}}">
-	<div id="flash-container">
+<input id="BaseURI" type="hidden" value="{{.BaseURI}}">
+<div id="flash-container">
 	{{range $fm := .flashes}}
-		<div id="flash-message" class="alert alert-box-fixed0 alert-box-fixed alert-dismissible {{.Class}}" role="alert">
+	<div id="flash-message" class="alert alert-box-fixed0 alert-box-fixed alert-dismissible {{.Class}}" role="alert">
 		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		{{.Message}}</div>
-		<!-- <div data-alert id="flash-message" class="alert-box-fixed0 alert-box-fixed {{.Class}}">{{.Message}}<a href="#" class="close">&times;</a></div> -->
+	<!-- <div data-alert id="flash-message" class="alert-box-fixed0 alert-box-fixed {{.Class}}">{{.Message}}<a href="#" class="close">&times;</a></div> -->
 	{{end}}
-	</div>
+</div>
 
-	{{template "content" .}}
-	
-	{{JS "static/js/core/jquery-3.2.1.min.js"}}
-	{{JS "static/js/plugins/underscore-min.js"}}
-	{{JS "static/js/core/bootstrap.min.js"}}
-	{{JS "static/js/global.js"}}
-	{{JS "static/js/core/tether.min.js"}}
-	{{JS "static/js/plugins/bootstrap-switch.js"}}
-	{{JS "static/js/plugins/nouislider.min.js"}}
-	{{JS "static/js/plugins/bootstrap-datepicker.js"}}
-	{{JS "static/js/core/now-ui-kit.js"}}
+{{template "content" .}}
 
-	{{template "foot" .}}
-  </body>
+{{JS "static/js/jquery1.11.0.min.js"}}
+{{JS "static/js/underscore-min.js"}}
+{{JS "static/js/bootstrap.min.js"}}
+{{JS "static/js/global.js"}}
+
+{{template "foot" .}}
+
+</body>
 </html>
