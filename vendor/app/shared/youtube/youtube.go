@@ -1,13 +1,13 @@
 package youtube
 
 var (
-	recap Info
+	recap YouTube
 )
 
-type Info struct {
+type YouTube struct {
 	ClientID string
 }
 
-func ReadConfig() Info {
+func ReadConfig() YouTube {
 	return recap
 }
