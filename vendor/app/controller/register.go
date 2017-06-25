@@ -32,7 +32,7 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) {
 	// Get session
 	sess := session.Instance(r)
 
-	// Prevent brute force login attempts by not hitting MySQL and pretending like it was invalid :-)
+	// Prevent brute force login attempts by not hitting MySQL and pretending like it was invalid
 	if sess.Values["register_attempt"] != nil && sess.Values["register_attempt"].(int) >= 5 {
 		log.Println("Brute force register prevented")
 		http.Redirect(w, r, "/register", http.StatusFound)
