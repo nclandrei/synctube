@@ -10,8 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"google.golang.org/api/youtube/v3"
-	"io/ioutil"
-	"golang.org/x/oauth2/google"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 )
@@ -22,10 +20,11 @@ var (
 
 type YT struct {
 	ClientID string
+
 }
 
-func ReadConfig() YT {
-	return recap
+func Configure(c YT) {
+	recap = c
 }
 
 // getClient uses a Context and Config to retrieve a Token
@@ -119,9 +118,4 @@ func channelsListByUsername(service *youtube.Service, part string, forUsername s
 		response.Items[0].Id,
 		response.Items[0].Snippet.Title,
 		response.Items[0].Statistics.ViewCount))
-}
-
-
-func main() {
-
 }
