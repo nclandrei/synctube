@@ -1,0 +1,12 @@
+{
+  "ImportPath": "github.com/nclandrei/YTSync",
+  "GoVersion": "go1.8",
+  "Packages": [
+    "./..."
+  ],
+  "Deps": [
+    {
+      "ImportPath": "github.com/gin-gonic/gin"
+    }
+  ]
+}
