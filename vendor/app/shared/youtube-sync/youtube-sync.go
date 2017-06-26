@@ -20,7 +20,13 @@ var (
 
 type YT struct {
 	ClientID string
-
+	ProjectID string
+	AuthURI string
+	TokenURI string
+	AuthProviderX509CertURL string
+	ClientSecret string
+	RedirectURI []string
+	JavaScriptOrigins []string
 }
 
 func Configure(c YT) {

@@ -16,7 +16,6 @@ import (
 	"app/shared/view"
 	"app/shared/view/plugin"
 	"app/shared/youtube-sync"
-	"io/ioutil"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/youtube/v3"
 	"golang.org/x/net/context"
@@ -42,34 +41,32 @@ func init() {
 
 func main() {
 	// Load the configuration file
-	jsonconfig.Load("config"+string(os.PathSeparator)+"config.json", config)
+	jsonconfig.Load("config"+string(os.PathSeparator)+"config.json", localConfig)
 
 	// Configure the session cookie store
-	session.Configure(config.Session)
+	session.Configure(localConfig.Session)
 
 	// Connect to database
-	database.Connect(config.Database)
+	database.Connect(localConfig.Database)
 
 	// Configure the Google reCAPTCHA prior to loading view plugins
-	recaptcha.Configure(config.Recaptcha)
+	recaptcha.Configure(localConfig.Recaptcha)
 
-	youtube_sync.Configure(config.YouTube)
+	// Configure YouTube specific settings
+	youtube_sync.Configure(localConfig.YouTube)
 
 	// Setup the views
-	view.Configure(config.View)
-	view.LoadTemplates(config.Template.Root, config.Template.Children)
+	view.Configure(localConfig.View)
+	view.LoadTemplates(localConfig.Template.Root, localConfig.Template.Children)
 	view.LoadPlugins(
-		plugin.TagHelper(config.View),
+		plugin.TagHelper(localConfig.View),
 		plugin.NoEscape(),
 		plugin.PrettyTime(),
 		recaptcha.Plugin())
 
 	ctx := context.Background()
 
-	b, err := ioutil.ReadFile("client_secret.json")
-	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-	}
+	b := localConfig.YouTube
 
 	// If modifying these scopes, delete your previously saved credentials
 	// at ~/.credentials/youtube-go-quickstart.json
@@ -85,7 +82,7 @@ func main() {
 	channelsListByUsername(service, "snippet,contentDetails,statistics", "GoogleDevelopers")
 
 	// Start the listener
-	server.Run(route.LoadHTTP(), route.LoadHTTPS(), config.Server)
+	server.Run(route.LoadHTTP(), route.LoadHTTPS(), localConfig.Server)
 }
 
 // *****************************************************************************
@@ -93,7 +90,7 @@ func main() {
 // *****************************************************************************
 
 // config the settings variable
-var config = &configuration{}
+var localConfig = &configuration{}
 
 // configuration contains the application settings
 type configuration struct {
