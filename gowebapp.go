@@ -76,12 +76,12 @@ func main() {
 	}
 
 	client := youtube_sync.GetClient(ctx, config)
-	service, err := youtube.New(client)
+	go youtube.New(client)
 
-	youtube_sync.HandleError(err, "Error creating YouTube client")
+	//youtube_sync.HandleError(err, "Error creating YouTube client")
 
 	// Start the listener
-	server.Run(route.LoadHTTP(), route.LoadHTTPS(), localConfig.Server)
+	go server.Run(route.LoadHTTP(), route.LoadHTTPS(), localConfig.Server)
 }
 
 // *****************************************************************************
