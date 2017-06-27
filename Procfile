@@ -1,1 +1,1 @@
-web: yt-sync
+web: ytsync
