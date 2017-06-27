@@ -106,5 +106,5 @@ Network Trash Folder
 Temporary Items
 .apdisk
 /config/
-!/vendor/
+/vendor/
 /YTSync
