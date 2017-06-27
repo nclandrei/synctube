@@ -5,10 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"app/model"
-	"app/shared/passhash"
-	"app/shared/session"
-	"app/shared/view"
+	"github.com/nclandrei/YTSync/model"
+	"github.com/nclandrei/YTSync/shared/passhash"
+	"github.com/nclandrei/YTSync/shared/session"
+	"github.com/nclandrei/YTSync/shared/view"
 
 	"github.com/gorilla/sessions"
 	"github.com/josephspurrier/csrfbanana"

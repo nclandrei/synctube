@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"app/shared/database"
+	"github.com/nclandrei/YTSync/shared/database"
 
 	"github.com/boltdb/bolt"
 	"gopkg.in/mgo.v2/bson"

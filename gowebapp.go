@@ -6,19 +6,19 @@ import (
 	"os"
 	"runtime"
 
-	"app/route"
-	"app/shared/database"
-	"app/shared/email"
-	"app/shared/jsonconfig"
-	"app/shared/recaptcha"
-	"app/shared/server"
-	"app/shared/session"
-	"app/shared/view"
-	"app/shared/view/plugin"
-	"app/shared/youtube-sync"
-	"google.golang.org/api/youtube/v3"
+	"github.com/nclandrei/YTSync/route"
+	"github.com/nclandrei/YTSync/shared/database"
+	"github.com/nclandrei/YTSync/shared/email"
+	"github.com/nclandrei/YTSync/shared/jsonconfig"
+	"github.com/nclandrei/YTSync/shared/recaptcha"
+	"github.com/nclandrei/YTSync/shared/server"
+	"github.com/nclandrei/YTSync/shared/session"
+	"github.com/nclandrei/YTSync/shared/view"
+	"github.com/nclandrei/YTSync/shared/view/plugin"
+	"github.com/nclandrei/YTSync/shared/youtube-sync"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
+	"google.golang.org/api/youtube/v3"
 )
 
 // *****************************************************************************
@@ -65,12 +65,12 @@ func main() {
 	// If modifying these scopes, delete your previously saved credentials
 	// at ~/.credentials/youtube-go-quickstart.json
 	config := &oauth2.Config{
-		ClientID: b.ClientID,
+		ClientID:     b.ClientID,
 		ClientSecret: b.ClientSecret,
-		Scopes: []string{youtube.YoutubeReadonlyScope},
-		RedirectURL: b.RedirectURI[0],
+		Scopes:       []string{youtube.YoutubeReadonlyScope},
+		RedirectURL:  b.RedirectURI[0],
 		Endpoint: oauth2.Endpoint{
-			AuthURL: b.AuthURI,
+			AuthURL:  b.AuthURI,
 			TokenURL: b.TokenURI,
 		},
 	}
@@ -93,14 +93,14 @@ var localConfig = &configuration{}
 
 // configuration contains the application settings
 type configuration struct {
-	Database  database.Info   	`json:"Database"`
-	Email     email.SMTPInfo  	`json:"Email"`
-	Recaptcha recaptcha.Info  	`json:"Recaptcha"`
-	Server    server.Server   	`json:"Server"`
-	Session   session.Session 	`json:"Session"`
-	Template  view.Template   	`json:"Template"`
-	View      view.View       	`json:"View"`
-	YouTube   youtube_sync.YT     `json:"YouTube"`
+	Database  database.Info   `json:"Database"`
+	Email     email.SMTPInfo  `json:"Email"`
+	Recaptcha recaptcha.Info  `json:"Recaptcha"`
+	Server    server.Server   `json:"Server"`
+	Session   session.Session `json:"Session"`
+	Template  view.Template   `json:"Template"`
+	View      view.View       `json:"View"`
+	YouTube   youtube_sync.YT `json:"YouTube"`
 }
 
 // ParseJSON unmarshals bytes to structs

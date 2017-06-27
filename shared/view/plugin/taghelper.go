@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"log"
 
-	"app/shared/view"
+	"github.com/nclandrei/YTSync/shared/view"
 )
 
 // TagHelper returns a template.FuncMap

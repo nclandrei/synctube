@@ -3,12 +3,12 @@ package route
 import (
 	"net/http"
 
-	"app/controller"
-	"app/route/middleware/acl"
-	hr "app/route/middleware/httprouterwrapper"
-	"app/route/middleware/logrequest"
-	"app/route/middleware/pprofhandler"
-	"app/shared/session"
+	"github.com/nclandrei/YTSync/controller"
+	"github.com/nclandrei/YTSync/route/middleware/acl"
+	hr "github.com/nclandrei/YTSync/route/middleware/httprouterwrapper"
+	"github.com/nclandrei/YTSync/route/middleware/logrequest"
+	"github.com/nclandrei/YTSync/route/middleware/pprofhandler"
+	"github.com/nclandrei/YTSync/shared/session"
 
 	"github.com/gorilla/context"
 	"github.com/josephspurrier/csrfbanana"

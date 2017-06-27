@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 
-	"app/shared/view"
+	"github.com/nclandrei/YTSync/shared/view"
 )
 
 // AboutGET displays the About page
