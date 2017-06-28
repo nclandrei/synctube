@@ -43,11 +43,15 @@ func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
 // It returns the retrieved Token.
 //noinspection ALL
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
-	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
+	http.Redirect()
 
 	var code string
+
+
+
 	if _, err := fmt.Scan(&code); err != nil {
 		log.Fatalf("Unable to read authorization code %v", err)
 	}

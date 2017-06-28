@@ -105,6 +105,15 @@ func routes() *httprouter.Router {
 		New(acl.DisallowAnon).
 		ThenFunc(controller.NotepadDeleteGET)))
 
+	// YouTube
+	r.GET("/youtubeLogin", hr.Handler(alice.
+	New(acl.DisallowAnon).
+		ThenFunc(controller.YouTubeGET)))
+
+	r.GET("/youtubeLoginCallback", hr.Handler(alice.
+	New(acl.DisallowAnon).
+		ThenFunc(controller.YouTubePOST)))
+
 	// Enable Pprof
 	r.GET("/debug/pprof/*pprof", hr.Handler(alice.
 		New(acl.DisallowAnon).
