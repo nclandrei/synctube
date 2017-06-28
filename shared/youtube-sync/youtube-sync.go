@@ -11,10 +11,7 @@ import (
 	"fmt"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
-)
-
-var (
-	recap YT
+	"google.golang.org/api/youtube/v3"
 )
 
 type YT struct {
@@ -27,28 +24,25 @@ type YT struct {
 	JavaScriptOrigins []string
 }
 
-func Configure(c YT) {
-	recap = c
-}
-
 // getClient uses a Context and Config to retrieve a Token
 // then generate a Client. It returns the generated Client.
-func GetClient(ctx context.Context, config *oauth2.Config) *http.Client {
-	cacheFile, err := TokenCacheFile()
+func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
+	cacheFile, err := tokenCacheFile()
 	if err != nil {
 		log.Fatalf("Unable to get path to cached credential file. %v", err)
 	}
-	tok, err := TokenFromFile(cacheFile)
+	tok, err := tokenFromFile(cacheFile)
 	if err != nil {
-		tok = GetTokenFromWeb(config)
-		SaveToken(cacheFile, tok)
+		tok = getTokenFromWeb(config)
+		saveToken(cacheFile, tok)
 	}
 	return config.Client(ctx, tok)
 }
 
 // getTokenFromWeb uses Config to request a Token.
 // It returns the retrieved Token.
-func GetTokenFromWeb(config *oauth2.Config) *oauth2.Token {
+//noinspection ALL
+func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
@@ -67,7 +61,7 @@ func GetTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 
 // tokenCacheFile generates credential file path/filename.
 // It returns the generated credential path/filename.
-func TokenCacheFile() (string, error) {
+func tokenCacheFile() (string, error) {
 	usr, err := user.Current()
 	if err != nil {
 		return "", err
@@ -80,7 +74,7 @@ func TokenCacheFile() (string, error) {
 
 // tokenFromFile retrieves a Token from a given file path.
 // It returns the retrieved Token and any read error encountered.
-func TokenFromFile(file string) (*oauth2.Token, error) {
+func tokenFromFile(file string) (*oauth2.Token, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
@@ -93,7 +87,7 @@ func TokenFromFile(file string) (*oauth2.Token, error) {
 
 // saveToken uses a file path to create a file and store the
 // token in it.
-func SaveToken(file string, token *oauth2.Token) {
+func saveToken(file string, token *oauth2.Token) {
 	fmt.Printf("Saving credential file to: %s\n", file)
 	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
@@ -103,11 +97,65 @@ func SaveToken(file string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func HandleError(err error, message string) {
+func handleError(err error, message string) {
 	if message == "" {
 		message = "Error making API call"
 	}
 	if err != nil {
 		log.Fatalf(message + ": %v", err.Error())
+	}
+}
+
+func GetPlaylists(ctx context.Context, config oauth2.Config) {
+	client := getClient(ctx, &config)
+
+	service, err := youtube.New(client)
+
+	handleError(err, "Error creating YouTube client")
+
+	call := service.Channels.List("contentDetails").Mine(true)
+
+	response, err := call.Do()
+	if err != nil {
+		// The channels.list method call returned an error.
+		log.Fatalf("Error making API call to list channels: %v", err.Error())
+	}
+
+	for _, channel := range response.Items {
+		playlistId := channel.ContentDetails.RelatedPlaylists.Uploads
+		// Print the playlist ID for the list of uploaded videos.
+		fmt.Printf("Videos in list %s\r\n", playlistId)
+
+		nextPageToken := ""
+		for {
+			// Call the playlistItems.list method to retrieve the
+			// list of uploaded videos. Each request retrieves 50
+			// videos until all videos have been retrieved.
+			playlistCall := service.PlaylistItems.List("snippet").
+				PlaylistId(playlistId).
+				MaxResults(50).
+				PageToken(nextPageToken)
+
+			playlistResponse, err := playlistCall.Do()
+
+			if err != nil {
+				// The playlistItems.list method call returned an error.
+				log.Fatalf("Error fetching playlist items: %v", err.Error())
+			}
+
+			for _, playlistItem := range playlistResponse.Items {
+				title := playlistItem.Snippet.Title
+				videoId := playlistItem.Snippet.ResourceId.VideoId
+				fmt.Printf("%v, (%v)\r\n", title, videoId)
+			}
+
+			// Set the token to retrieve the next page of results
+			// or exit the loop if all results have been retrieved.
+			nextPageToken = playlistResponse.NextPageToken
+			if nextPageToken == "" {
+				break
+			}
+			fmt.Println()
+		}
 	}
 }
