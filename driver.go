@@ -19,7 +19,6 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/youtube/v3"
-	"fmt"
 )
 
 // *****************************************************************************
@@ -46,9 +45,6 @@ func main() {
 
 	// Configure the Google reCAPTCHA prior to loading view plugins
 	recaptcha.Configure(localConfig.Recaptcha)
-
-	// Configure YouTube specific settings
-	youtube_sync.Configure(localConfig.YouTube)
 
 	// Setup the views
 	view.Configure(localConfig.View)
@@ -105,8 +101,4 @@ type configuration struct {
 // ParseJSON unmarshals bytes to structs
 func (c *configuration) ParseJSON(b []byte) error {
 	return json.Unmarshal(b, &c)
-}
-
-func testYouTube(ctx context.Context, config oauth2.Config) {
-
 }
