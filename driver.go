@@ -45,6 +45,9 @@ func main() {
 	// Configure the Google reCAPTCHA prior to loading view plugins
 	recaptcha.Configure(localConfig.Recaptcha)
 
+	// Configure YouTube settings
+	youtube_sync.Configure(loadYTConfig(localConfig.YouTube))
+
 	// Setup the views
 	view.Configure(localConfig.View)
 	view.LoadTemplates(localConfig.Template.Root, localConfig.Template.Children)
@@ -53,21 +56,6 @@ func main() {
 		plugin.NoEscape(),
 		plugin.PrettyTime(),
 		recaptcha.Plugin())
-
-	b := localConfig.YouTube
-
-	// If modifying these scopes, delete your previously saved credentials
-	// at ~/.credentials/youtube-go-quickstart.json
-	config := &oauth2.Config{
-		ClientID:     b.ClientID,
-		ClientSecret: b.ClientSecret,
-		Scopes:       []string{youtube.YoutubeReadonlyScope},
-		RedirectURL:  b.RedirectURI[0],
-		Endpoint: oauth2.Endpoint{
-			AuthURL:  b.AuthURI,
-			TokenURL: b.TokenURI,
-		},
-	}
 
 	// Start the listener
 	go server.Run(route.LoadHTTP(), route.LoadHTTPS(), localConfig.Server)
@@ -95,4 +83,17 @@ type configuration struct {
 // ParseJSON unmarshals bytes to structs
 func (c *configuration) ParseJSON(b []byte) error {
 	return json.Unmarshal(b, &c)
+}
+
+func loadYTConfig (conf youtube_sync.YT) oauth2.Config {
+	return oauth2.Config{
+		ClientID:     conf.ClientID,
+		ClientSecret: conf.ClientSecret,
+		Scopes:       []string{youtube.YoutubeReadonlyScope},
+		RedirectURL:  conf.RedirectURI[0],
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  conf.AuthURI,
+			TokenURL: conf.TokenURI,
+		},
+	}
 }

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
-	"google.golang.org/api/youtube/v3"
+	"github.com/revel/config"
 )
 
 type YT struct {
@@ -20,25 +20,25 @@ type YT struct {
 }
 
 var (
-	yytConfig oauth2.Config
+	ytConfig oauth2.Config
 )
 
 func Configure (config oauth2.Config) {
-	yytConfig = config
+	ytConfig = config
 }
 
 // getClient uses a Context and Config to retrieve a Token
 // then generate a Client. It returns the generated Client.
-func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
-	tok := getTokenFromWeb(config)
-	return config.Client(ctx, tok)
+func getClient(ctx context.Context) *http.Client {
+	tok := getTokenFromWeb()
+	return ytConfig.Client(ctx, tok)
 }
 
 // getTokenFromWeb uses Config to request a Token.
 // It returns the retrieved Token.
 //noinspection ALL
-func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
-	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+func getTokenFromWeb() *oauth2.Token {
+	authURL := ytConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
 
