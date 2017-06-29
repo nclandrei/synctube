@@ -27,13 +27,6 @@ func Configure (config oauth2.Config) {
 	ytConfig = config
 }
 
-// getClient uses a Context and Config to retrieve a Token
-// then generate a Client. It returns the generated Client.
-func getClient(ctx context.Context) *http.Client {
-	tok := getTokenFromWeb()
-	return ytConfig.Client(ctx, tok)
-}
-
 // getTokenFromWeb uses Config to request a Token.
 // It returns the retrieved Token.
 //noinspection ALL
@@ -41,6 +34,15 @@ func GetAuthorizationURL() string {
 	authURL := ytConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 	return authURL
 }
+
+func GetTokenFromWeb(code string) (*oauth2.Token, error) {
+	tok, err := ytConfig.Exchange(oauth2.NoContext, code)
+	if err != nil {
+		log.Fatalf("Unable to retrieve token from web %v", err)
+	}
+	return tok, err
+}
+
 
 func handleError(err error, message string) {
 	if message == "" {
