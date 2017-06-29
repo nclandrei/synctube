@@ -5,10 +5,11 @@ import (
 	"github.com/nclandrei/YTSync/shared/view"
 	"github.com/revel/config"
 	"golang.org/x/oauth2"
+	"github.com/nclandrei/YTSync/shared/youtube-sync"
 )
 
 func YouTubeGET(w http.ResponseWriter, r *http.Request) {
-	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+	authURL := youtube_sync.GetAuthorizationURL()
 	http.Redirect(w, r, authURL, http.StatusTemporaryRedirect)
 }
 

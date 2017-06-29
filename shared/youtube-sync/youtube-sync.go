@@ -37,22 +37,9 @@ func getClient(ctx context.Context) *http.Client {
 // getTokenFromWeb uses Config to request a Token.
 // It returns the retrieved Token.
 //noinspection ALL
-func getTokenFromWeb() *oauth2.Token {
+func GetAuthorizationURL() string {
 	authURL := ytConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
-	fmt.Printf("Go to the following link in your browser then type the "+
-		"authorization code: \n%v\n", authURL)
-
-	var code string
-
-	if _, err := fmt.Scan(&code); err != nil {
-		log.Fatalf("Unable to read authorization code %v", err)
-	}
-
-	tok, err := config.Exchange(oauth2.NoContext, code)
-	if err != nil {
-		log.Fatalf("Unable to retrieve token from web %v", err)
-	}
-	return tok
+	return authURL
 }
 
 func handleError(err error, message string) {
