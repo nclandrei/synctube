@@ -16,7 +16,6 @@ import (
 	"github.com/nclandrei/YTSync/shared/view"
 	"github.com/nclandrei/YTSync/shared/view/plugin"
 	"github.com/nclandrei/YTSync/shared/youtube-sync"
-	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/youtube/v3"
 )
@@ -55,8 +54,6 @@ func main() {
 		plugin.PrettyTime(),
 		recaptcha.Plugin())
 
-	ctx := context.Background()
-
 	b := localConfig.YouTube
 
 	// If modifying these scopes, delete your previously saved credentials
@@ -72,11 +69,8 @@ func main() {
 		},
 	}
 
-
 	// Start the listener
 	go server.Run(route.LoadHTTP(), route.LoadHTTPS(), localConfig.Server)
-
-	youtube_sync.GetPlaylists(ctx, *config)
 }
 
 // *****************************************************************************
