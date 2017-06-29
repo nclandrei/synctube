@@ -2,11 +2,7 @@ package youtube_sync
 
 import (
 	"log"
-	"net/http"
-	"fmt"
-	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
-	"github.com/revel/config"
 )
 
 type YT struct {
@@ -44,11 +40,11 @@ func GetTokenFromWeb(code string) (*oauth2.Token, error) {
 }
 
 
-func handleError(err error, message string) {
+/*func handleError(err error, message string) {
 	if message == "" {
 		message = "Error making API call"
 	}
 	if err != nil {
 		log.Fatalf(message + ": %v", err.Error())
 	}
-}
+}*/

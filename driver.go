@@ -58,7 +58,7 @@ func main() {
 		recaptcha.Plugin())
 
 	// Start the listener
-	go server.Run(route.LoadHTTP(), route.LoadHTTPS(), localConfig.Server)
+	server.Run(route.LoadHTTP(), route.LoadHTTPS(), localConfig.Server)
 }
 
 // *****************************************************************************
