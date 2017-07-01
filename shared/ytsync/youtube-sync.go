@@ -1,10 +1,15 @@
-package youtube_sync
+package ytsync
 
 import (
 	"log"
 	"golang.org/x/oauth2"
 )
 
+/**
+	YouTube struct that holds all necessary information
+	regarding the project; gets populated through config
+	files
+ */
 type YT struct {
 	ClientID string
 	ProjectID string
@@ -19,6 +24,7 @@ var (
 	ytConfig oauth2.Config
 )
 
+// function that sets up the YT instance
 func Configure (config oauth2.Config) {
 	ytConfig = config
 }
@@ -31,6 +37,7 @@ func GetAuthorizationURL() string {
 	return authURL
 }
 
+// given an authorization code it returns the token from a page
 func GetTokenFromWeb(code string) (*oauth2.Token, error) {
 	tok, err := ytConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {

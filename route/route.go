@@ -105,11 +105,12 @@ func routes() *httprouter.Router {
 		New(acl.DisallowAnon).
 		ThenFunc(controller.NotepadDeleteGET)))
 
-	// YouTube
+	// goes to Google authorization so that user can grant access to ytsync
 	r.GET("/youtubeLogin", hr.Handler(alice.
 	New(acl.DisallowAnon).
 		ThenFunc(controller.YouTubeGET)))
 
+	// callback registered to handle user's info
 	r.GET("/youtubeLoginCallback", hr.Handler(alice.
 	New(acl.DisallowAnon).
 		ThenFunc(controller.YouTubePOST)))
