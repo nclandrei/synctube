@@ -90,5 +90,5 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			fmt.Println()
 		}
 	}
-
+	http.Redirect(w, r, "/", http.StatusFound)
 }
