@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"net/http"
-	"golang.org/x/oauth2"
-	"github.com/nclandrei/YTSync/shared/ytsync"
-	"fmt"
 	"context"
+	"fmt"
+	"github.com/nclandrei/YTSync/shared/ytsync"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/youtube/v3"
 	"log"
+	"net/http"
 )
 
 const (

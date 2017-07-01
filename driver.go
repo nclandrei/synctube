@@ -77,7 +77,7 @@ type configuration struct {
 	Session   session.Session `json:"Session"`
 	Template  view.Template   `json:"Template"`
 	View      view.View       `json:"View"`
-	YouTube   ytsync.YT `json:"YouTube"`
+	YouTube   ytsync.YT       `json:"YouTube"`
 }
 
 // ParseJSON unmarshals bytes to structs
@@ -85,7 +85,7 @@ func (c *configuration) ParseJSON(b []byte) error {
 	return json.Unmarshal(b, &c)
 }
 
-func loadYTConfig (conf ytsync.YT) oauth2.Config {
+func loadYTConfig(conf ytsync.YT) oauth2.Config {
 	return oauth2.Config{
 		ClientID:     conf.ClientID,
 		ClientSecret: conf.ClientSecret,
