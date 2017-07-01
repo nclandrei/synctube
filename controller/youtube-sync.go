@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"net/http"
-	"golang.org/x/oauth2"
-	"github.com/nclandrei/YTSync/shared/youtube-sync"
-	"fmt"
 	"context"
+	"fmt"
+	"github.com/nclandrei/YTSync/shared/ytsync"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/youtube/v3"
 	"log"
+	"net/http"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 )
 
 func YouTubeGET(w http.ResponseWriter, r *http.Request) {
-	authURL := youtube_sync.GetAuthorizationURL()
+	authURL := ytsync.GetAuthorizationURL()
 	http.Redirect(w, r, authURL, http.StatusTemporaryRedirect)
 }
 
@@ -29,7 +29,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	code := r.FormValue("code")
-	token, err := youtube_sync.GetTokenFromWeb(code)
+	token, err := ytsync.GetTokenFromWeb(code)
 
 	if err != nil {
 		fmt.Printf("oauthConf.Exchange() failed with '%s'\n", err)
@@ -90,5 +90,5 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			fmt.Println()
 		}
 	}
-
+	http.Redirect(w, r, "/", http.StatusFound)
 }
