@@ -54,7 +54,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, channel := range response.Items {
-		playlistId := channel.ContentDetails.RelatedPlaylists.Uploads
+		playlistId := channel.ContentDetails.RelatedPlaylists.Likes
 		// Print the playlist ID for the list of uploaded videos.
 		fmt.Printf("Videos in list %s\r\n", playlistId)
 

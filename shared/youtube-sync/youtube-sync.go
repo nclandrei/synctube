@@ -27,7 +27,7 @@ func Configure (config oauth2.Config) {
 // It returns the retrieved Token.
 //noinspection ALL
 func GetAuthorizationURL() string {
-	authURL := ytConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+	authURL := ytConfig.AuthCodeURL("random_token")
 	return authURL
 }
 
