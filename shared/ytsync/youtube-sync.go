@@ -6,7 +6,7 @@ import (
 )
 
 /**
-YouTube struct that holds all necessary information
+YT - struct that holds all necessary information
 regarding the project; gets populated through config
 files
 */
@@ -29,15 +29,13 @@ func Configure(config oauth2.Config) {
 	ytConfig = config
 }
 
-// getTokenFromWeb uses Config to request a Token.
-// It returns the retrieved Token.
-//noinspection ALL
+// GetAuthorizationURL - uses Config to request a Token.
 func GetAuthorizationURL() string {
 	authURL := ytConfig.AuthCodeURL("random_token")
 	return authURL
 }
 
-// given an authorization code it returns the token from a page
+// GetTokenFromWeb - given an authorization code it returns the token from a page
 func GetTokenFromWeb(code string) (*oauth2.Token, error) {
 	tok, err := ytConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
