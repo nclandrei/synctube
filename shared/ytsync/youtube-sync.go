@@ -6,6 +6,8 @@ import (
 	"context"
 	"net/http"
 	"github.com/nclandrei/YTSync/model"
+	//"fmt"
+	"fmt"
 )
 
 /**
@@ -34,7 +36,8 @@ func Configure(config oauth2.Config) {
 
 func GetClient (ctx context.Context, code string, userId string) *http.Client {
 	tok, err := getTokenFromDb(userId)
-	if err != nil {
+	fmt.Println(tok)
+	if err != nil || !tok.Valid(){
 		tok, _ = getTokenFromWeb(code)
 		updateTokenInDb(userId, tok)
 	}
@@ -56,15 +59,6 @@ func getTokenFromWeb(code string) (*oauth2.Token, error) {
 	return tok, err
 }
 
-func handleError(err error, message string) {
-	if message == "" {
-		message = "Error making API call"
-	}
-	if err != nil {
-		log.Fatalf(message + ": %v", err.Error())
-	}
-}
-
 // tokenFromFile retrieves a Token from a given file path.
 // It returns the retrieved Token and any read error encountered.
 func getTokenFromDb(userId string) (*oauth2.Token, error) {
@@ -81,3 +75,13 @@ func updateTokenInDb(userID string, token *oauth2.Token) {
 		log.Fatalf("Unable to update user's token: %v", err)
 	}
 }
+
+func handleError(err error, message string) {
+	if message == "" {
+		message = "Error making API call"
+	}
+	if err != nil {
+		log.Fatalf(message + ": %v", err.Error())
+	}
+}
+

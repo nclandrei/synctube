@@ -40,7 +40,7 @@ func (u *User) UserID() string {
 	return u.ObjectID.Hex()
 }
 
-// UserRefreshToken returns the refresh token of the user
+// UserByToken returns the user's token
 func UserByToken(userID string) (User, error) {
 	var err error
 	result := User{}
@@ -56,18 +56,17 @@ func UserByToken(userID string) (User, error) {
 	return result, standardizeError(err)
 }
 
+// UpdateUserToken updates the record with a new
 func UpdateUserToken(userID string, token oauth2.Token) error {
 	var err error
-
 	if database.CheckConnection() {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("user")
-		err = c.Update(bson.M{"_id": bson.ObjectIdHex(userID)}, bson.M{"token": token})
+		err = c.Update(bson.M{"_id" : bson.ObjectIdHex(userID)}, bson.M{"$set" : bson.M{"token": token}})
 	} else {
 		err = ErrUnavailable
 	}
-
 	return err
 }
 
@@ -104,7 +103,7 @@ func UserCreate(email, password string) error {
 			Email:     email,
 			Password:  password,
 			StatusID:  1,
-			Token: oauth2.Token{},
+			Token: 	   oauth2.Token{},
 			CreatedAt: now,
 			UpdatedAt: now,
 			Deleted:   0,
