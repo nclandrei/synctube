@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"os/user"
 	"path/filepath"
+	"github.com/nclandrei/YTSync/model"
 )
 
 /**
@@ -37,12 +38,16 @@ func Configure(config oauth2.Config) {
 	ytConfig = config
 }
 
-func GetClient (code string) *http.Client {
-	token, err := getTokenFromWeb(code)
+func GetClient (ctx context.Context, code string, userId string) *http.Client {
 	if err != nil {
-		fmt.Printf("oauthConf.Exchange() failed with '%s'\n", err)
+		log.Fatalf("Unable to get path to cached credential file. %v", err)
 	}
-	return ytConfig.Client(context.Background(), token)
+	tok, err := getTokenFromDb(userId)
+	if err != nil {
+		tok, _ = getTokenFromWeb(code)
+		updateTokenInDb(tok)
+	}
+	return ytConfig.Client(ctx, tok)
 }
 
 // GetAuthorizationURL - uses Config to request a Token.
@@ -69,30 +74,10 @@ func handleError(err error, message string) {
 	}
 }
 
-// tokenCacheFile generates credential file path/filename.
-// It returns the generated credential path/filename.
-func tokenCacheFile() (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-	tokenCacheDir := filepath.Join(usr.HomeDir, ".credentials")
-	os.MkdirAll(tokenCacheDir, 0700)
-	return filepath.Join(tokenCacheDir,
-		url.QueryEscape("youtube-go-quickstart.json")), err
-}
-
 // tokenFromFile retrieves a Token from a given file path.
 // It returns the retrieved Token and any read error encountered.
-func tokenFromFile(file string) (*oauth2.Token, error) {
-	f, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	t := &oauth2.Token{}
-	err = json.NewDecoder(f).Decode(t)
-	defer f.Close()
-	return t, err
+func getTokenFromDb(userId string) (*oauth2.Token, error) {
+	return model.UserRefreshToken(userId)
 }
 
 // saveToken uses a file path to create a file and store the

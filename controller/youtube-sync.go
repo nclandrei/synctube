@@ -5,6 +5,7 @@ import (
 	"github.com/nclandrei/YTSync/shared/ytsync"
 	"google.golang.org/api/youtube/v3"
 	"net/http"
+	"context"
 )
 
 const (
@@ -26,7 +27,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	code := r.FormValue("code")
-	client := ytsync.GetClient(code)
+	client := ytsync.GetClient(context.Background(), code)
 
 	service, err := youtube.New(client)
 	if err != nil {
