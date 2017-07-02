@@ -90,7 +90,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	callTwo := service.Playlists.List("snippet,contentDetails").Mine(true)
+	callTwo := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
 	responseTwo, err := callTwo.Do()
 	if err != nil {
 		// The channels.list method call returned an error.
@@ -103,7 +103,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 		nextPageToken := ""
 		for {
-			playlistItems := service.PlaylistItems.List("snippet, contentDetails").
+			playlistItems := service.PlaylistItems.List("snippet,contentDetails").
 				PlaylistId(item.Id).MaxResults(50).PageToken(nextPageToken)
 
 			playlistResponse, err := playlistItems.Do()
