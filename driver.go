@@ -91,7 +91,7 @@ func loadYTConfig(conf ytsync.YT) oauth2.Config {
 		ClientSecret: conf.ClientSecret,
 		Scopes:       []string{youtube.YoutubeReadonlyScope},
 		RedirectURL:  conf.RedirectURI[0],
-		Endpoint: oauth2.Endpoint {
+		Endpoint: oauth2.Endpoint{
 			AuthURL:  conf.AuthURI,
 			TokenURL: conf.TokenURI,
 		},
