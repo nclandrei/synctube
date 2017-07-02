@@ -89,5 +89,19 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			fmt.Println()
 		}
 	}
+
+	callTwo := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
+	responseTwo, err := callTwo.Do()
+	if err != nil {
+		// The channels.list method call returned an error.
+		log.Fatalf("Error making API call to list channels: %v", err.Error())
+	}
+
+	for _, item := range responseTwo.Items {
+		fmt.Println(item.Snippet.Title)
+	}
+
+	fmt.Print("\n\n\n\n\n\n")
+
 	http.Redirect(w, r, "/", http.StatusFound)
 }
