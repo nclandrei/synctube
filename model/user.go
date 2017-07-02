@@ -15,14 +15,15 @@ import (
 
 // User table contains the information for each user
 type User struct {
-	ObjectID  bson.ObjectId `bson:"_id"`
-	ID        uint32        `db:"id" bson:"id,omitempty"` // Don't use Id, use UserID() instead for consistency with MongoDB
-	Email     string        `db:"email" bson:"email"`
-	Password  string        `db:"password" bson:"password"`
-	StatusID  uint8         `db:"status_id" bson:"status_id"`
-	CreatedAt time.Time     `db:"created_at" bson:"created_at"`
-	UpdatedAt time.Time     `db:"updated_at" bson:"updated_at"`
-	Deleted   uint8         `db:"deleted" bson:"deleted"`
+	ObjectID  		bson.ObjectId `bson:"_id"`
+	ID               uint32        `db:"id" bson:"id,omitempty"` // Don't use Id, use UserID() instead for consistency with MongoDB
+	Email     		string        `db:"email" bson:"email"`
+	Password  		string        `db:"password" bson:"password"`
+	StatusID  		uint8         `db:"status_id" bson:"status_id"`
+	RefreshToken		string        `db:"refresh_token" bson:"refresh_token"`
+	CreatedAt 		time.Time     `db:"created_at" bson:"created_at"`
+	UpdatedAt 		time.Time     `db:"updated_at" bson:"updated_at"`
+	Deleted   		uint8         `db:"deleted" bson:"deleted"`
 }
 
 // UserStatus table contains every possible user status (active/inactive)
@@ -37,7 +38,6 @@ type UserStatus struct {
 // UserID returns the user id
 func (u *User) UserID() string {
 	r := ""
-
 	switch database.ReadConfig().Type {
 	case database.TypeMySQL:
 		r = fmt.Sprintf("%v", u.ID)
@@ -46,8 +46,11 @@ func (u *User) UserID() string {
 	case database.TypeBolt:
 		r = u.ObjectID.Hex()
 	}
-
 	return r
+}
+
+func (u *User) UserRefreshToken() string {
+	return u.RefreshToken
 }
 
 // UserByEmail gets user information from email

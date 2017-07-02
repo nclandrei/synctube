@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"github.com/nclandrei/YTSync/shared/ytsync"
 	"google.golang.org/api/youtube/v3"
-	//"log"
 	"net/http"
 )
 
 const (
-	oauthStateString string = "random_token"
+	oauthStateString string = "random"
 )
 
 func YouTubeGET(w http.ResponseWriter, r *http.Request) {

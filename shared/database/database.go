@@ -27,12 +27,9 @@ var (
 type Type string
 
 const (
-	// TypeBolt is BoltDB
-	TypeBolt Type = "Bolt"
+
 	// TypeMongoDB is MongoDB
 	TypeMongoDB Type = "MongoDB"
-	// TypeMySQL is MySQL
-	TypeMySQL Type = "MySQL"
 )
 
 // Info contains the database configurations
@@ -45,21 +42,6 @@ type Info struct {
 	Bolt BoltInfo
 	// MongoDB info if used
 	MongoDB MongoDBInfo
-}
-
-// MySQLInfo is the details for the database connection
-type MySQLInfo struct {
-	Username  string
-	Password  string
-	Name      string
-	Hostname  string
-	Port      int
-	Parameter string
-}
-
-// BoltInfo is the details for the database connection
-type BoltInfo struct {
-	Path string
 }
 
 // MongoDBInfo is the details for the database connection
