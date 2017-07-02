@@ -1,47 +1,41 @@
-<!--TODO include web starter kit from Google-->
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="">
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Starter Kit</title>
 
-	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-	<meta name="description" content="">
-	<meta name="keywords" content="">
-	<meta name="author" content="">
+  <!-- Disable tap highlight on IE -->
+  <meta name="msapplication-tap-highlight" content="no">
 
-	<title>{{template "title" .}}</title>
+  <!-- Web Application Manifest -->
+  <link rel="manifest" href="manifest.json">
 
-	<!-- Favicons from http://realfavicongenerator.net -->
-	<link rel="apple-touch-icon" sizes="57x57" href="/static/favicons/apple-touch-icon-57x57.png">
-	<link rel="apple-touch-icon" sizes="114x114" href="/static/favicons/apple-touch-icon-114x114.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="/static/favicons/apple-touch-icon-72x72.png">
-	<link rel="apple-touch-icon" sizes="144x144" href="/static/favicons/apple-touch-icon-144x144.png">
-	<link rel="apple-touch-icon" sizes="60x60" href="/static/favicons/apple-touch-icon-60x60.png">
-	<link rel="apple-touch-icon" sizes="120x120" href="/static/favicons/apple-touch-icon-120x120.png">
-	<link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon-76x76.png">
-	<link rel="apple-touch-icon" sizes="152x152" href="/static/favicons/apple-touch-icon-152x152.png">
-	<link rel="icon" type="image/png" href="/static/favicons/favicon-196x196.png" sizes="196x196">
-	<link rel="icon" type="image/png" href="/static/favicons/favicon-160x160.png" sizes="160x160">
-	<link rel="icon" type="image/png" href="/static/favicons/favicon-96x96.png" sizes="96x96">
-	<link rel="icon" type="image/png" href="/static/favicons/favicon-16x16.png" sizes="16x16">
-	<link rel="icon" type="image/png" href="/static/favicons/favicon-32x32.png" sizes="32x32">
-	<meta name="msapplication-TileColor" content="#da532c">
-	<meta name="msapplication-TileImage" content="/static/favicons/mstile-144x144.png">
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Web Starter Kit">
+  <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
 
-	{{CSS "static/css/bootstrap.min.css"}}
-	{{CSS "//fonts.googleapis.com/css?family=Open+Sans:300,400,bold,italic"}}
-	{{CSS "static/css/global.css"}}
-	{{CSS "static/css/materialize.min.css"}}
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Web Starter Kit">
+  <link rel="apple-touch-icon" href="images/touch/apple-touch-icon.png">
 
+  <!-- Tile icon for Win8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+  <meta name="msapplication-TileColor" content="#2F3BA2">
 
-	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-	<!--[if lt IE 9]>
-	<script src="//oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
-	<script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-	<![endif]-->
+  <!-- Color the status bar on mobile devices -->
+  <meta name="theme-color" content="#2F3BA2">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.indigo-pink.min.css">
+
+	{{CSS "web/styles/main.css"}}
 
 	{{template "head" .}}
 </head>
@@ -76,11 +70,8 @@
 
 {{template "content" .}}
 
-{{JS "static/js/core/jquery-3.2.1.min.js"}}
-{{JS "static/js/plugins/underscore-min.js"}}
-{{JS "static/js/core/bootstrap.min.js"}}
-{{JS "static/js/core/materialize.min.js"}}
-{{JS "static/js/global.js"}}
+<script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+{{JS "web/scripts/main.js"}}
 
 {{template "foot" .}}
 

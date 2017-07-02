@@ -52,7 +52,7 @@ func routes() *httprouter.Router {
 		ThenFunc(controller.Error404)
 
 	// Serve static files, no directory browsing
-	r.GET("/static/*filepath", hr.Handler(alice.
+	r.GET("/web/*filepath", hr.Handler(alice.
 		New().
 		ThenFunc(controller.Static)))
 
@@ -132,7 +132,7 @@ func middleware(h http.Handler) http.Handler {
 	cs := csrfbanana.New(h, session.Store, session.Name)
 	cs.FailureHandler(http.HandlerFunc(controller.InvalidToken))
 	cs.ClearAfterUsage(true)
-	cs.ExcludeRegexPaths([]string{"/static(.*)"})
+	cs.ExcludeRegexPaths([]string{"/web(.*)"})
 	csrfbanana.TokenLength = 32
 	csrfbanana.TokenName = "token"
 	csrfbanana.SingleToken = false
