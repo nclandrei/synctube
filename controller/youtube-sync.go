@@ -3,7 +3,7 @@ package controller
 import (
 	"fmt"
 	"github.com/nclandrei/YTSync/shared/ytsync"
-	//"google.golang.org/api/youtube/v3"
+	"google.golang.org/api/youtube/v3"
 	"net/http"
 	"context"
 	"github.com/nclandrei/YTSync/shared/session"
@@ -32,18 +32,17 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	userID := fmt.Sprintf("%s", sess.Values["id"])
 
 	client := ytsync.GetClient(context.Background(), code, userID)
-	fmt.Println(client)
 
-	//service, err := youtube.New(client)
-	//if err != nil {
-	//	fmt.Errorf("Could not retrieve client - %v", err.Error())
-	//}
+	service, err := youtube.New(client)
+	if err != nil {
+		fmt.Errorf("Could not retrieve client - %v", err.Error())
+	}
 
 	// Start making YouTube API calls.
 	// Call the channels.list method. Set the mine parameter to true to
 	// retrieve the playlist ID for uploads to the authenticated user's
 	// channel.
-	//call := service.Channels.List("contentDetails").Mine(true)
+	call := service.Channels.List("contentDetails").Mine(true)
 	//secondCall := service.Playlists.List("contentDetails").Mine(true)
 
 	//response, err := call.Do()
