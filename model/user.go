@@ -6,7 +6,7 @@ import (
 	"github.com/nclandrei/YTSync/shared/database"
 
 	"gopkg.in/mgo.v2/bson"
-	"fmt"
+	"golang.org/x/oauth2"
 )
 
 // *****************************************************************************
@@ -16,11 +16,11 @@ import (
 // User table contains the information for each user
 type User struct {
 	ObjectID  		bson.ObjectId `bson:"_id"`
-	ID             uint32        `db:"id" bson:"id,omitempty"` // Don't use Id, use UserID() instead for consistency with MongoDB
+	ID             	uint32        `db:"id" bson:"id,omitempty"` // Don't use Id, use UserID() instead for consistency with MongoDB
 	Email     		string        `db:"email" bson:"email"`
 	Password  		string        `db:"password" bson:"password"`
 	StatusID  		uint8         `db:"status_id" bson:"status_id"`
-	RefreshToken	string        `db:"refresh_token" bson:"refresh_token"`
+	Token            oauth2.Token  `db:"token" bson:"token"`
 	CreatedAt 		time.Time     `db:"created_at" bson:"created_at"`
 	UpdatedAt 		time.Time     `db:"updated_at" bson:"updated_at"`
 	Deleted   		uint8         `db:"deleted" bson:"deleted"`
@@ -41,23 +41,34 @@ func (u *User) UserID() string {
 }
 
 // UserRefreshToken returns the refresh token of the user
-func  UserRefreshToken(userID string) (string, error) {
+func UserByToken(userID string) (User, error) {
 	var err error
-	var result string
+	result := User{}
 
 	if database.CheckConnection() {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("user")
-
-		// Validate the object id
-		if bson.IsObjectIdHex(userID) {
-			err = c.Find(bson.M{"user_id": bson.ObjectIdHex(userID)}).Select(bson.M{"refresh_token":1}).One(&result)
-		} else {
-			err = ErrNoResult
-		}
+		err = c.Find(bson.M{"_id": bson.ObjectIdHex(userID)}).One(&result)
+	} else {
+		err = ErrUnavailable
 	}
 	return result, standardizeError(err)
+}
+
+func UpdateUserToken(userID string, token oauth2.Token) error {
+	var err error
+
+	if database.CheckConnection() {
+		session := database.Mongo.Copy()
+		defer session.Close()
+		c := session.DB(database.ReadConfig().MongoDB.Database).C("user")
+		err = c.Update(bson.M{"_id": bson.ObjectIdHex(userID)}, bson.M{"token": token})
+	} else {
+		err = ErrUnavailable
+	}
+
+	return err
 }
 
 // UserByEmail gets user information from email
@@ -93,7 +104,7 @@ func UserCreate(email, password string) error {
 			Email:     email,
 			Password:  password,
 			StatusID:  1,
-			RefreshToken: "",
+			Token: oauth2.Token{},
 			CreatedAt: now,
 			UpdatedAt: now,
 			Deleted:   0,

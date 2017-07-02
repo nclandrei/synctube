@@ -6,6 +6,7 @@ import (
 	"google.golang.org/api/youtube/v3"
 	"net/http"
 	"context"
+	"github.com/nclandrei/YTSync/shared/session"
 )
 
 const (
@@ -19,6 +20,7 @@ func YouTubeGET(w http.ResponseWriter, r *http.Request) {
 
 func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
+	sess := session.Instance(r)
 
 	if state != oauthStateString {
 		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
@@ -27,7 +29,9 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	code := r.FormValue("code")
-	client := ytsync.GetClient(context.Background(), code)
+	userID := fmt.Sprintf("%s", sess.Values["id"])
+
+	client := ytsync.GetClient(context.Background(), code, userID)
 
 	service, err := youtube.New(client)
 	if err != nil {

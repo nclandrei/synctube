@@ -5,12 +5,6 @@ import (
 	"log"
 	"context"
 	"net/http"
-	"fmt"
-	"net/url"
-	"os"
-	"encoding/json"
-	"os/user"
-	"path/filepath"
 	"github.com/nclandrei/YTSync/model"
 )
 
@@ -39,13 +33,10 @@ func Configure(config oauth2.Config) {
 }
 
 func GetClient (ctx context.Context, code string, userId string) *http.Client {
-	if err != nil {
-		log.Fatalf("Unable to get path to cached credential file. %v", err)
-	}
 	tok, err := getTokenFromDb(userId)
 	if err != nil {
 		tok, _ = getTokenFromWeb(code)
-		updateTokenInDb(tok)
+		updateTokenInDb(userId, tok)
 	}
 	return ytConfig.Client(ctx, tok)
 }
@@ -77,17 +68,16 @@ func handleError(err error, message string) {
 // tokenFromFile retrieves a Token from a given file path.
 // It returns the retrieved Token and any read error encountered.
 func getTokenFromDb(userId string) (*oauth2.Token, error) {
-	return model.UserRefreshToken(userId)
+	currentUser, err := model.UserByToken(userId)
+	if err != nil {
+		log.Fatalf("Unable to retrieve user by id: %v", err)
+	}
+	return &currentUser.Token, err
 }
 
-// saveToken uses a file path to create a file and store the
-// token in it.
-func saveToken(file string, token *oauth2.Token) {
-	fmt.Printf("Saving credential file to: %s\n", file)
-	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+func updateTokenInDb(userID string, token *oauth2.Token) {
+	err := model.UpdateUserToken(userID, *token)
 	if err != nil {
-		log.Fatalf("Unable to cache oauth token: %v", err)
+		log.Fatalf("Unable to update user's token: %v", err)
 	}
-	defer f.Close()
-	json.NewEncoder(f).Encode(token)
 }
