@@ -3,6 +3,9 @@ package ytsync
 import (
 	"golang.org/x/oauth2"
 	"log"
+	"context"
+	"net/http"
+	"fmt"
 )
 
 /**
@@ -29,6 +32,14 @@ func Configure(config oauth2.Config) {
 	ytConfig = config
 }
 
+func GetClient (code string) *http.Client {
+	token, err := getTokenFromWeb(code)
+	if err != nil {
+		fmt.Printf("oauthConf.Exchange() failed with '%s'\n", err)
+	}
+	return ytConfig.Client(context.Background(), token)
+}
+
 // GetAuthorizationURL - uses Config to request a Token.
 func GetAuthorizationURL() string {
 	authURL := ytConfig.AuthCodeURL("random_token")
@@ -36,19 +47,19 @@ func GetAuthorizationURL() string {
 }
 
 // GetTokenFromWeb - given an authorization code it returns the token from a page
-func GetTokenFromWeb(code string) (*oauth2.Token, error) {
-	tok, err := ytConfig.Exchange(oauth2.NoContext, code)
+func getTokenFromWeb(code string) (*oauth2.Token, error) {
+	tok, err := ytConfig.Exchange(context.Background(), code)
 	if err != nil {
 		log.Fatalf("Unable to retrieve token from web %v", err)
 	}
 	return tok, err
 }
 
-/*func handleError(err error, message string) {
+func handleError(err error, message string) {
 	if message == "" {
 		message = "Error making API call"
 	}
 	if err != nil {
 		log.Fatalf(message + ": %v", err.Error())
 	}
-}*/
+}
