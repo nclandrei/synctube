@@ -90,7 +90,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	callTwo := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
+	callTwo := service.Playlists.List("snippet,contentDetails").Mine(true)
 	responseTwo, err := callTwo.Do()
 	if err != nil {
 		// The channels.list method call returned an error.
@@ -98,10 +98,35 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, item := range responseTwo.Items {
-		fmt.Println(item.Snippet.Title)
+
+		fmt.Printf("Videos in playlsit --- %s, %s\r\n", item.Id, item.Snippet.Title)
+
+		nextPageToken := ""
+		for {
+			playlistItems := service.PlaylistItems.List("snippet, contentDetails").
+				PlaylistId(item.Id).MaxResults(50).PageToken(nextPageToken)
+
+			playlistResponse, err := playlistItems.Do()
+
+			if err != nil {
+				// The playlistItems.list method call returned an error.
+				log.Fatalf("Error fetching playlist items: %v", err.Error())
+			}
+
+			for _, playlistItem := range playlistResponse.Items {
+				title := playlistItem.Snippet.Title
+				videoId := playlistItem.Snippet.ResourceId.VideoId
+				fmt.Printf("%v, (%v)\r\n", title, videoId)
+			}
+
+			// Set the token to retrieve the next page of results
+			// or exit the loop if all results have been retrieved.
+			nextPageToken = playlistResponse.NextPageToken
+			if nextPageToken == "" {
+				break
+			}
+			fmt.Println()
+		}
 	}
-
-	fmt.Print("\n\n\n\n\n\n")
-
 	http.Redirect(w, r, "/", http.StatusFound)
 }
