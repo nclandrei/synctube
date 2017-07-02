@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/nclandrei/YTSync/shared/database"
@@ -37,16 +36,7 @@ type UserStatus struct {
 
 // UserID returns the user id
 func (u *User) UserID() string {
-	r := ""
-	switch database.ReadConfig().Type {
-	case database.TypeMySQL:
-		r = fmt.Sprintf("%v", u.ID)
-	case database.TypeMongoDB:
-		r = u.ObjectID.Hex()
-	case database.TypeBolt:
-		r = u.ObjectID.Hex()
-	}
-	return r
+	return u.ObjectID.Hex()
 }
 
 func (u *User) UserRefreshToken() string {
@@ -59,27 +49,14 @@ func UserByEmail(email string) (User, error) {
 
 	result := User{}
 
-	switch database.ReadConfig().Type {
-	case database.TypeMySQL:
-		err = database.SQL.Get(&result, "SELECT id, password, status_id FROM user WHERE email = ? LIMIT 1", email)
-	case database.TypeMongoDB:
-		if database.CheckConnection() {
-			session := database.Mongo.Copy()
-			defer session.Close()
-			c := session.DB(database.ReadConfig().MongoDB.Database).C("user")
-			err = c.Find(bson.M{"email": email}).One(&result)
-		} else {
-			err = ErrUnavailable
-		}
-	case database.TypeBolt:
-		err = database.View("user", email, &result)
-		if err != nil {
-			err = ErrNoResult
-		}
-	default:
-		err = ErrCode
+	if database.CheckConnection() {
+		session := database.Mongo.Copy()
+		defer session.Close()
+		c := session.DB(database.ReadConfig().MongoDB.Database).C("user")
+		err = c.Find(bson.M{"email": email}).One(&result)
+	} else {
+		err = ErrUnavailable
 	}
-
 	return result, standardizeError(err)
 }
 
@@ -89,30 +66,11 @@ func UserCreate(email, password string) error {
 
 	now := time.Now()
 
-	switch database.ReadConfig().Type {
-	case database.TypeMySQL:
-		_, err = database.SQL.Exec("INSERT INTO user (email, password) VALUES (?,?)",
-			email, password)
-	case database.TypeMongoDB:
-		if database.CheckConnection() {
-			session := database.Mongo.Copy()
-			defer session.Close()
-			c := session.DB(database.ReadConfig().MongoDB.Database).C("user")
+	if database.CheckConnection() {
+		session := database.Mongo.Copy()
+		defer session.Close()
+		c := session.DB(database.ReadConfig().MongoDB.Database).C("user")
 
-			user := &User{
-				ObjectID:  bson.NewObjectId(),
-				Email:     email,
-				Password:  password,
-				StatusID:  1,
-				CreatedAt: now,
-				UpdatedAt: now,
-				Deleted:   0,
-			}
-			err = c.Insert(user)
-		} else {
-			err = ErrUnavailable
-		}
-	case database.TypeBolt:
 		user := &User{
 			ObjectID:  bson.NewObjectId(),
 			Email:     email,
@@ -122,11 +80,9 @@ func UserCreate(email, password string) error {
 			UpdatedAt: now,
 			Deleted:   0,
 		}
-
-		err = database.Update("user", user.Email, &user)
-	default:
-		err = ErrCode
+		err = c.Insert(user)
+	} else {
+		err = ErrUnavailable
 	}
-
 	return standardizeError(err)
 }
