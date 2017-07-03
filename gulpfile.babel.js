@@ -28,7 +28,7 @@ gulp.task('images', () =>
       progressive: true,
       interlaced: true
     })))
-    .pipe(gulp.dest('dist/images'))
+    .pipe(gulp.dest('web/dist/images'))
     .pipe($.size({title: 'images'}))
 );
 
@@ -36,7 +36,7 @@ gulp.task('images', () =>
 gulp.task('copy', () =>
   gulp.src([
     'web/*',
-    '!web/*.html',
+    '!web/*.tmpl',
     'node_modules/apache-server-configs/dist/.htaccess'
   ], {
     dot: true
@@ -99,20 +99,20 @@ gulp.task('scripts', () =>
       // Output files
       .pipe($.size({title: 'scripts'}))
       .pipe($.sourcemaps.write('.'))
-      .pipe(gulp.dest('dist/scripts'))
+      .pipe(gulp.dest('web/dist/scripts'))
       .pipe(gulp.dest('.tmp/scripts'))
 );
 
-// Scan your HTML for assets & optimize them
-gulp.task('html', () => {
-  return gulp.src('web/**/*.html')
+// Scan your tmpl for assets & optimize them
+gulp.task('tmpl', () => {
+  return gulp.src('web/**/*.tmpl')
     .pipe($.useref({
       searchPath: '{.tmp,web}',
       noAssets: true
     }))
 
-    // Minify any HTML
-    .pipe($.if('*.html', $.htmlmin({
+    // Minify any tmpl
+    .pipe($.if('*.tmpl', $.htmlmin({
       removeComments: true,
       collapseWhitespace: true,
       collapseBooleanAttributes: true,
@@ -124,19 +124,19 @@ gulp.task('html', () => {
       removeOptionalTags: true
     })))
     // Output files
-    .pipe($.if('*.html', $.size({title: 'html', showFiles: true})))
-    .pipe(gulp.dest('dist'));
+    .pipe($.if('*.tmpl', $.size({title: 'tmpl', showFiles: true})))
+    .pipe(gulp.dest('web/dist'));
 });
 
 // Clean output directory
-gulp.task('clean', () => del(['.tmp', 'dist/*', '!dist/.git'], {dot: true}));
+gulp.task('clean', () => del(['.tmp', 'web/dist/*', '!web/dist/.git'], {dot: true}));
 
 // Watch files for changes & reload
 gulp.task('serve', ['scripts', 'styles'], () => {
   browserSync({
     notify: false,
     // Customize the Browsersync console logging prefix
-    logPrefix: 'WSK',
+    logPrefix: 'YTS',
     // Allow scroll syncing across breakpoints
     scrollElementMapping: ['main', '.mdl-layout'],
     // Run as an https by uncommenting 'https: true'
@@ -147,7 +147,7 @@ gulp.task('serve', ['scripts', 'styles'], () => {
     port: 4321
   });
 
-  gulp.watch(['web/**/*.html'], reload);
+  gulp.watch(['web/**/*.tmpl'], reload);
   gulp.watch(['web/styles/**/*.{scss,css}'], ['styles', reload]);
   gulp.watch(['web/scripts/**/*.js'], ['lint', 'scripts', reload]);
   gulp.watch(['web/images/**/*'], reload);
@@ -157,14 +157,14 @@ gulp.task('serve', ['scripts', 'styles'], () => {
 gulp.task('serve:dist', ['default'], () =>
   browserSync({
     notify: false,
-    logPrefix: 'WSK',
+    logPrefix: 'YTS',
     // Allow scroll syncing across breakpoints
     scrollElementMapping: ['main', '.mdl-layout'],
     // Run as an https by uncommenting 'https: true'
     // Note: this uses an unsigned certificate which on first access
     //       will present a certificate warning in the browser.
     // https: true,
-    server: 'dist',
+    server: 'web/dist',
     port: 3001
   })
 );
@@ -173,27 +173,16 @@ gulp.task('serve:dist', ['default'], () =>
 gulp.task('default', ['clean'], cb =>
   runSequence(
     'styles',
-    ['lint', 'html', 'scripts', 'images', 'copy'],
+    ['lint', 'tmpl', 'scripts', 'images', 'copy'],
     'generate-service-worker',
     cb
   )
 );
 
-// Run PageSpeed Insights
-gulp.task('pagespeed', cb =>
-  // Update the below URL to the public URL of your site
-  pagespeed('example.com', {
-    strategy: 'mobile'
-    // By default we use the PageSpeed Insights free (no API key) tier.
-    // Use a Google Developer API key if you have one: http://goo.gl/RkN0vE
-    // key: 'YOUR_API_KEY'
-  }, cb)
-);
-
 // Copy over the scripts that are used in importScripts as part of the generate-service-worker task.
 gulp.task('copy-sw-scripts', () => {
   return gulp.src(['node_modules/sw-toolbox/sw-toolbox.js', 'web/scripts/sw/runtime-caching.js'])
-    .pipe(gulp.dest('dist/scripts/sw'));
+    .pipe(gulp.dest('web/dist/scripts/sw'));
 });
 
 // See http://www.html5rocks.com/en/tutorials/service-worker/introduction/ for
@@ -202,23 +191,23 @@ gulp.task('copy-sw-scripts', () => {
 // local resources. This should only be done for the 'dist' directory, to allow
 // live reload to work as expected when serving from the 'web' directory.
 gulp.task('generate-service-worker', ['copy-sw-scripts'], () => {
-  const rootDir = 'dist';
+  const rootDir = 'web/dist';
   const filepath = path.join(rootDir, 'service-worker.js');
 
   return swPrecache.write(filepath, {
     // Used to avoid cache conflicts when serving on localhost.
-    cacheId: pkg.name || 'web-starter-kit',
+    cacheId: pkg.name || 'youtube-sync',
     // sw-toolbox.js needs to be listed first. It sets up methods used in runtime-caching.js.
     importScripts: [
-      'scripts/sw/sw-toolbox.js',
-      'scripts/sw/runtime-caching.js'
+      'web/scripts/sw/sw-toolbox.js',
+      'web/scripts/sw/runtime-caching.js'
     ],
     staticFileGlobs: [
       // Add/remove glob patterns to match your directory setup.
       `${rootDir}/images/**/*`,
       `${rootDir}/scripts/**/*.js`,
       `${rootDir}/styles/**/*.css`,
-      `${rootDir}/*.{html,json}`
+      `${rootDir}/*.{tmpl,json}`
     ],
     // Translates a static file path to the relative URL that it's served from.
     // This is '/' rather than path.sep because the paths returned from
