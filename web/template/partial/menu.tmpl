@@ -1,14 +1,10 @@
 {{if eq .AuthLevel "auth"}}
 
-<ul class="nav navbar-nav navbar-right">
-  <li><a href="{{.BaseURI}}about">About</a></li>
-  <li><a href="{{.BaseURI}}logout">Logout</a></li>
-</ul>
+  <a href="{{.BaseURI}}about" class="mdl-layout__tab is-active">About</a>
+  <a href="{{.BaseURI}}logout" class="mdl-layout__tab is-active">Logout</a>
 
 {{else}}
 
-<ul class="nav navbar-nav navbar-right">
-  <li><a href="{{.BaseURI}}about">About</a></li>
-</ul>
+  <a href="{{.BaseURI}}about" class="mdl-layout__tab is-active">About</a>
 
 {{end}}

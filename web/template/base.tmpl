@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -35,9 +35,9 @@
 
   <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.indigo-pink.min.css">
 
-	{{CSS "web/styles/main.css"}}
+  {{CSS "web/styles/main.css"}}
 
-	{{template "head" .}}
+  {{template "head" .}}
 </head>
 <body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
 
@@ -51,11 +51,7 @@
     <div class="mdl-layout--large-screen-only mdl-layout__header-row">
     </div>
     <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--primary-dark">
-      <a href="#overview" class="mdl-layout__tab is-active">Overview</a>
-      <a href="#features" class="mdl-layout__tab">Features</a>
-      <a href="#features" class="mdl-layout__tab">Details</a>
-      <a href="#features" class="mdl-layout__tab">Technology</a>
-      <a href="#features" class="mdl-layout__tab">FAQ</a>
+      {{template "menu.tmpl" .}}
       <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored mdl-shadow--4dp mdl-color--accent" id="add">
         <i class="material-icons" role="presentation">add</i>
         <span class="visuallyhidden">Add</span>
@@ -63,41 +59,38 @@
     </div>
   </header>
 
-
-
-<nav class="navbar navbar-static-top">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="{{.BaseURI}}">Go Web App</a>
-		</div>
-		<div id="navbar" class="navbar-collapse collapse">
-			{{template "menu.tmpl" .}}
-		</div>
-	</div>
-</nav>
-
-<input id="BaseURI" type="hidden" value="{{.BaseURI}}">
-<div id="flash-container">
-	{{range $fm := .flashes}}
-	<div id="flash-message" class="alert alert-box-fixed0 alert-box-fixed alert-dismissible {{.Class}}" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		{{.Message}}</div>
-	<!-- <div data-alert id="flash-message" class="alert-box-fixed0 alert-box-fixed {{.Class}}">{{.Message}}<a href="#" class="close">&times;</a></div> -->
-	{{end}}
+  <main class="mdl-layout__content">
+    <div class="mdl-layout__tab-panel is-active" id="overview">
+      <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+        <header class="section__play-btn mdl-cell mdl-cell--3-col-desktop mdl-cell--2-col-tablet mdl-cell--4-col-phone mdl-color--teal-100 mdl-color-text--white">
+          <i class="material-icons">play_circle_filled</i>
+        </header>
+        <div class="mdl-card mdl-cell mdl-cell--9-col-desktop mdl-cell--6-col-tablet mdl-cell--4-col-phone">
+          <div class="mdl-card__supporting-text">
+            <h4>Features</h4>
+            Dolore ex deserunt aute fugiat aute nulla ea sunt aliqua nisi cupidatat eu. Nostrud in laboris labore nisi amet do dolor eu fugiat consectetur elit cillum esse.
+          </div>
+          <div class="mdl-card__actions">
+            <a href="#" class="mdl-button">Read our features</a>
+          </div>
+        </div>
+        <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="btn1">
+          <i class="material-icons">more_vert</i>
+        </button>
+        <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="btn1">
+          <li class="mdl-menu__item">Lorem</li>
+          <li class="mdl-menu__item" disabled>Ipsum</li>
+          <li class="mdl-menu__item">Dolor</li>
+        </ul>
+      </section>
+    </div>
+    {{template "content" .}}
+  </main>
 </div>
+  <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+  {{JS "web/scripts/main.js"}}
 
-{{template "content" .}}
-
-<script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
-{{JS "web/scripts/main.js"}}
-
-{{template "foot" .}}
+  {{template "foot" .}}
 
 </body>
 </html>
