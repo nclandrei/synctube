@@ -108,3 +108,5 @@ Temporary Items
 /config/
 /vendor/
 YTSync
+node_modules
+.tmp
