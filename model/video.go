@@ -14,17 +14,15 @@ import (
 
 // Video table contains the information for each Video per user
 type Video struct {
-    ObjectID  bson.ObjectId `bson:"_id"`
-    ID        uint32        `db:"id" bson:"id,omitempty"`
-    Content   string        `db:"content" bson:"content"`
-    UserID    bson.ObjectId `bson:"user_id"`
-    UID       uint32        `db:"user_id" bson:"userid,omitempty"`
-    CreatedAt time.Time     `db:"created_at" bson:"created_at"`
-    UpdatedAt time.Time     `db:"updated_at" bson:"updated_at"`
-    Deleted   uint8         `db:"deleted" bson:"deleted"`
+    ObjectID    bson.ObjectId   `bson:"_id"`
+    ID          string          `db:"id" bson:"id,omitempty"`
+    Title       string          `db:"content" bson:"content"`
+    URL         string          `db:"url" bson:"url"`
+    PlaylistID  bson.ObjectId   `bson:"user_id"`
+    UID         uint32          `db:"user_id" bson:"userid,omitempty"`
 }
 
-// VideoID returns the note id
+// VideoID returns the video id
 func (u *Video) VideoID() string {
     r := ""
     r = u.ObjectID.Hex()

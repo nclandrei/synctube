@@ -15,13 +15,10 @@ import (
 // Playlist table contains the information for each playlist per user
 type Playlist struct {
 	ObjectID  bson.ObjectId `bson:"_id"`
-	ID        uint32        `db:"id" bson:"id,omitempty"`
-	Content   string        `db:"content" bson:"content"`
+	ID        string        `db:"id" bson:"id,omitempty"`
+	Title     string        `db:"title" bson:"title"`
 	UserID    bson.ObjectId `bson:"user_id"`
 	UID       uint32        `db:"user_id" bson:"userid,omitempty"`
-	CreatedAt time.Time     `db:"created_at" bson:"created_at"`
-	UpdatedAt time.Time     `db:"updated_at" bson:"updated_at"`
-	Deleted   uint8         `db:"deleted" bson:"deleted"`
 }
 
 // PlaylistID returns the note id
@@ -86,25 +83,22 @@ func PlaylistByUserID(userID string) ([]Playlist, error) {
 }
 
 // NoteCreate creates a note
-func PlaylistCreate(content string, userID string) error {
+func PlaylistCreate(id string, title string, userID string) error {
 	var err error
 
-	now := time.Now()
 
 	if database.CheckConnection() {
 		// Create a copy of mongo
 		session := database.Mongo.Copy()
 		defer session.Close()
-		c := session.DB(database.ReadConfig().MongoDB.Database).C("playlist")
+        c := session.DB(database.ReadConfig().MongoDB.Database).C("playlist")
 
-		playlist := &Playlist{
-			ObjectID:  bson.NewObjectId(),
-			Content:   content,
-			UserID:    bson.ObjectIdHex(userID),
-			CreatedAt: now,
-			UpdatedAt: now,
-			Deleted:   0,
-		}
+        playlist := &Playlist{
+            ObjectID:  bson.NewObjectId(),
+            ID:        id,
+            Title:     title,
+            UserID:    bson.ObjectIdHex(userID),
+        }
 		err = c.Insert(playlist)
 	} else {
 		err = ErrUnavailable
@@ -117,8 +111,6 @@ func PlaylistCreate(content string, userID string) error {
 func PlaylistUpdate(content string, userID string, playlistID string) error {
 	var err error
 
-	now := time.Now()
-
 	if database.CheckConnection() {
 		// Create a copy of mongo
 		session := database.Mongo.Copy()
@@ -127,10 +119,9 @@ func PlaylistUpdate(content string, userID string, playlistID string) error {
 		var playlist Playlist
 		playlist, err = PlaylistByID(userID, playlistID)
 		if err == nil {
-			// Confirm the owner is attempting to modify the note
+			// Confirm the owner is attempting to update the playlist
 			if playlist.UserID.Hex() == userID {
-				playlist.UpdatedAt = now
-				playlist.Content = content
+				playlist.Title = content
 				err = c.UpdateId(bson.ObjectIdHex(playlistID), &playlist)
 			} else {
 				err = ErrUnauthorized
