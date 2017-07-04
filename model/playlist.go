@@ -45,7 +45,7 @@ func PlaylistByID(userID string, playlistID string) (Playlist, error) {
 
 		// Validate the object id
 		if bson.IsObjectIdHex(playlistID) {
-			err = c.FindId(bson.ObjectIdHex(noteID)).One(&result)
+			err = c.FindId(bson.ObjectIdHex(playlistID)).One(&result)
 			if result.UserID != bson.ObjectIdHex(userID) {
 				result = Playlist{}
 				err = ErrUnauthorized
@@ -95,9 +95,9 @@ func PlaylistCreate(content string, userID string) error {
 		// Create a copy of mongo
 		session := database.Mongo.Copy()
 		defer session.Close()
-		c := session.DB(database.ReadConfig().MongoDB.Database).C("note")
+		c := session.DB(database.ReadConfig().MongoDB.Database).C("playlist")
 
-		note := &Note{
+		playlist := &Playlist{
 			ObjectID:  bson.NewObjectId(),
 			Content:   content,
 			UserID:    bson.ObjectIdHex(userID),
@@ -105,7 +105,7 @@ func PlaylistCreate(content string, userID string) error {
 			UpdatedAt: now,
 			Deleted:   0,
 		}
-		err = c.Insert(note)
+		err = c.Insert(playlist)
 	} else {
 		err = ErrUnavailable
 	}
@@ -114,7 +114,7 @@ func PlaylistCreate(content string, userID string) error {
 }
 
 // NoteUpdate updates a note
-func NoteUpdate(content string, userID string, noteID string) error {
+func PlaylistUpdate(content string, userID string, playlistID string) error {
 	var err error
 
 	now := time.Now()
@@ -123,15 +123,15 @@ func NoteUpdate(content string, userID string, noteID string) error {
 		// Create a copy of mongo
 		session := database.Mongo.Copy()
 		defer session.Close()
-		c := session.DB(database.ReadConfig().MongoDB.Database).C("note")
-		var note Note
-		note, err = NoteByID(userID, noteID)
+		c := session.DB(database.ReadConfig().MongoDB.Database).C("playlist")
+		var playlist Playlist
+		playlist, err = PlaylistByID(userID, playlistID)
 		if err == nil {
 			// Confirm the owner is attempting to modify the note
-			if note.UserID.Hex() == userID {
-				note.UpdatedAt = now
-				note.Content = content
-				err = c.UpdateId(bson.ObjectIdHex(noteID), &note)
+			if playlist.UserID.Hex() == userID {
+				playlist.UpdatedAt = now
+				playlist.Content = content
+				err = c.UpdateId(bson.ObjectIdHex(playlistID), &playlist)
 			} else {
 				err = ErrUnauthorized
 			}
@@ -143,22 +143,22 @@ func NoteUpdate(content string, userID string, noteID string) error {
 	return standardizeError(err)
 }
 
-// NoteDelete deletes a note
-func NoteDelete(userID string, noteID string) error {
+// PlaylistDelete deletes a note
+func PlaylistDelete(userID string, playlistID string) error {
 	var err error
 
 	if database.CheckConnection() {
 		// Create a copy of mongo
 		session := database.Mongo.Copy()
 		defer session.Close()
-		c := session.DB(database.ReadConfig().MongoDB.Database).C("note")
+		c := session.DB(database.ReadConfig().MongoDB.Database).C("playlist")
 
-		var note Note
-		note, err = NoteByID(userID, noteID)
+		var playlist Playlist
+		playlist, err = PlaylistByID(userID, playlistID)
 		if err == nil {
 			// Confirm the owner is attempting to modify the note
-			if note.UserID.Hex() == userID {
-				err = c.RemoveId(bson.ObjectIdHex(noteID))
+			if playlist.UserID.Hex() == userID {
+				err = c.RemoveId(bson.ObjectIdHex(playlistID))
 			} else {
 				err = ErrUnauthorized
 			}
