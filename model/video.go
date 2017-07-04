@@ -29,35 +29,6 @@ func (u *Video) VideoID() string {
     return r
 }
 
-// VideoByID gets note by ID
-func VideoByID(userID string, videoID string) (Video, error) {
-    var err error
-
-    result := Video{}
-
-    if database.CheckConnection() {
-        // Create a copy of mongo
-        session := database.Mongo.Copy()
-        defer session.Close()
-        c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
-
-        // Validate the object id
-        if bson.IsObjectIdHex(videoID) {
-            err = c.FindId(bson.ObjectIdHex(videoID)).One(&result)
-            if result.UserID != bson.ObjectIdHex(userID) {
-                result = Video{}
-                err = ErrUnauthorized
-            }
-        } else {
-            err = ErrNoResult
-        }
-    } else {
-        err = ErrUnavailable
-    }
-
-    return result, standardizeError(err)
-}
-
 // VideoByUserID gets all Videos for a user
 func VideoByUserID(userID string) ([]Video, error) {
     var err error
