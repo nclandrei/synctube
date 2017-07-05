@@ -59,6 +59,8 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		// Print the playlist ID for the list of uploaded videos.
 		fmt.Printf("Videos in list %s\r\n", playlistId)
 
+        model.PlaylistCreate(playlistId, "likes", userID)
+
 		nextPageToken := ""
 		for {
 			// Call the playlistItems.list method to retrieve the
@@ -76,7 +78,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				log.Fatalf("Error fetching playlist items: %v", err.Error())
 			}
 
-            model.PlaylistCreate(playlistId, "likes", userID)
 
 			for _, playlistItem := range playlistResponse.Items {
 				title := playlistItem.Snippet.Title

@@ -16,8 +16,7 @@ type Video struct {
     ID          string          `db:"id" bson:"id,omitempty"`
     Title       string          `db:"content" bson:"content"`
     URL         string          `db:"url" bson:"url"`
-    PlaylistID  bson.ObjectId   `bson:"playlist_id"`
-    PID         uint32          `db:"playlist_id" bson:"playlistid,omitempty"`
+    PlaylistID  string          `bson:"playlist_id"`
 }
 
 // VideoID returns the video id
@@ -97,7 +96,7 @@ func VideoCreate(id string, title string, url string, playlistID string) error {
             ID:         id,
             Title:      title,
             URL:        url,
-            PlaylistID: bson.ObjectIdHex(playlistID),
+            PlaylistID: playlistID,
         }
         err = c.Insert(Video)
     } else {
