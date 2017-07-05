@@ -17,6 +17,7 @@ type Video struct {
     Title       string          `db:"content" bson:"content"`
     URL         string          `db:"url" bson:"url"`
     PlaylistID  bson.ObjectId   `bson:"playlist_id"`
+    PID         uint32          `db:"playlist_id" bson:"playlistid,omitempty"`
 }
 
 // VideoID returns the video id
@@ -40,18 +41,19 @@ func VideoByID(videoID string, playlistID string) (Video, error) {
 
 		// Validate the object id
 		if bson.IsObjectIdHex(videoID) {
-			err = c.Find(bson.M{"$and" : [bson.M{"playlist_id" : playlistID}, bson.M{"id" : videoID}]}).One(&result)
+            // TODO - complete this so that it selects properly
+			//err = c.Find(bson.M{"$and" : [bson.M{"playlist_id" : playlistID}, bson.M{"id" : videoID}]}).One(&result)
+            err = c.FindId(bson.ObjectIdHex(videoID)).One(&result)
 			if err != nil {
-				result = Note{}
+				result = Video{}
 				err = ErrUnauthorized
 			}
 		} else {
 			err = ErrNoResult
 		}
 	} else {
-		err = ErrUnavailable
-	}
-
+        err = ErrUnavailable
+    }
 	return result, standardizeError(err)
 }
 
@@ -119,7 +121,7 @@ func VideoDelete(videoID string, playlistID string) error {
         video, err = VideoByID(videoID, playlistID)
         if err == nil {
             // Confirm the owner is attempting to modify the note
-            if video.UserID.Hex() == userID {
+            if video.VideoID().Hex() == videoID {
                 err = c.RemoveId(bson.ObjectIdHex(videoID))
             } else {
                 err = ErrUnauthorized
