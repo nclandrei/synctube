@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	"github.com/nclandrei/YTSync/shared/database"
 
 	"gopkg.in/mgo.v2/bson"
@@ -18,7 +16,6 @@ type Playlist struct {
 	ID        string        `db:"id" bson:"id,omitempty"`
 	Title     string        `db:"title" bson:"title"`
 	UserID    bson.ObjectId `bson:"user_id"`
-	UID       uint32        `db:"user_id" bson:"userid,omitempty"`
 }
 
 // PlaylistID returns the note id

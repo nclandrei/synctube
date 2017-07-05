@@ -1,8 +1,6 @@
 package model
 
 import (
-"time"
-
 "github.com/nclandrei/YTSync/shared/database"
 
 "gopkg.in/mgo.v2/bson"
@@ -18,8 +16,7 @@ type Video struct {
     ID          string          `db:"id" bson:"id,omitempty"`
     Title       string          `db:"content" bson:"content"`
     URL         string          `db:"url" bson:"url"`
-    PlaylistID  bson.ObjectId   `bson:"user_id"`
-    UID         uint32          `db:"user_id" bson:"userid,omitempty"`
+    PlaylistID  bson.ObjectId   `bson:"playlist_id"`
 }
 
 // VideoID returns the video id
@@ -29,8 +26,37 @@ func (u *Video) VideoID() string {
     return r
 }
 
+// VideoByID gets note by ID
+func VideoByID(videoID string, playlistID string) (Video, error) {
+	var err error
+
+	result := Video{}
+
+	if database.CheckConnection() {
+		// Create a copy of mongo
+		session := database.Mongo.Copy()
+		defer session.Close()
+		c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
+
+		// Validate the object id
+		if bson.IsObjectIdHex(videoID) {
+			err = c.Find(bson.M{"$and" : [bson.M{"playlist_id" : playlistID}, bson.M{"id" : videoID}]}).One(&result)
+			if err != nil {
+				result = Note{}
+				err = ErrUnauthorized
+			}
+		} else {
+			err = ErrNoResult
+		}
+	} else {
+		err = ErrUnavailable
+	}
+
+	return result, standardizeError(err)
+}
+
 // VideoByUserID gets all Videos for a user
-func VideoByUserID(userID string) ([]Video, error) {
+func VideoByPlaylistID(playlistID string) ([]Video, error) {
     var err error
 
     var result []Video
@@ -42,8 +68,8 @@ func VideoByUserID(userID string) ([]Video, error) {
         c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
 
         // Validate the object id
-        if bson.IsObjectIdHex(userID) {
-            err = c.Find(bson.M{"user_id": bson.ObjectIdHex(userID)}).All(&result)
+        if bson.IsObjectIdHex(playlistID) {
+            err = c.Find(bson.M{"playlist_id": bson.ObjectIdHex(playlistID)}).All(&result)
         } else {
             err = ErrNoResult
         }
@@ -54,11 +80,9 @@ func VideoByUserID(userID string) ([]Video, error) {
     return result, standardizeError(err)
 }
 
-// NoteCreate creates a note
-func VideoCreate(content string, userID string) error {
+// VideoCreate creates a note
+func VideoCreate(id string, title string, url string, playlistID string) error {
     var err error
-
-    now := time.Now()
 
     if database.CheckConnection() {
         // Create a copy of mongo
@@ -67,12 +91,11 @@ func VideoCreate(content string, userID string) error {
         c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
 
         Video := &Video{
-            ObjectID:  bson.NewObjectId(),
-            Content:   content,
-            UserID:    bson.ObjectIdHex(userID),
-            CreatedAt: now,
-            UpdatedAt: now,
-            Deleted:   0,
+            ObjectID:   bson.NewObjectId(),
+            ID:         id,
+            Title:      title,
+            URL:        url,
+            PlaylistID: bson.ObjectIdHex(playlistID),
         }
         err = c.Insert(Video)
     } else {
@@ -82,38 +105,8 @@ func VideoCreate(content string, userID string) error {
     return standardizeError(err)
 }
 
-// NoteUpdate updates a note
-func VideoUpdate(content string, userID string, VideoID string) error {
-    var err error
-
-    now := time.Now()
-
-    if database.CheckConnection() {
-        // Create a copy of mongo
-        session := database.Mongo.Copy()
-        defer session.Close()
-        c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
-        var Video Video
-        Video, err = VideoByID(userID, VideoID)
-        if err == nil {
-            // Confirm the owner is attempting to modify the note
-            if Video.UserID.Hex() == userID {
-                Video.UpdatedAt = now
-                Video.Content = content
-                err = c.UpdateId(bson.ObjectIdHex(VideoID), &Video)
-            } else {
-                err = ErrUnauthorized
-            }
-        }
-    } else {
-        err = ErrUnavailable
-    }
-
-    return standardizeError(err)
-}
-
-// VideoDelete deletes a note
-func VideoDelete(userID string, videoID string) error {
+// VideoDelete deletes a video
+func VideoDelete(videoID string, playlistID string) error {
     var err error
 
     if database.CheckConnection() {
@@ -123,7 +116,7 @@ func VideoDelete(userID string, videoID string) error {
         c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
 
         var video Video
-        video, err = VideoByID(userID, videoID)
+        video, err = VideoByID(videoID, playlistID)
         if err == nil {
             // Confirm the owner is attempting to modify the note
             if video.UserID.Hex() == userID {

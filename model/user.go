@@ -20,7 +20,7 @@ type User struct {
 	Email     		string        `db:"email" bson:"email"`
 	Password  		string        `db:"password" bson:"password"`
 	StatusID  		uint8         `db:"status_id" bson:"status_id"`
-	Token            oauth2.Token  `db:"token" bson:"token"`
+	Token          oauth2.Token  `db:"token" bson:"token"`
 	CreatedAt 		time.Time     `db:"created_at" bson:"created_at"`
 	UpdatedAt 		time.Time     `db:"updated_at" bson:"updated_at"`
 	Deleted   		uint8         `db:"deleted" bson:"deleted"`
