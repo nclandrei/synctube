@@ -9,10 +9,12 @@ import (
 	"github.com/nclandrei/YTSync/shared/session"
 	//"log"
 	"log"
+    "github.com/nclandrei/YTSync/model"
 )
 
 const (
 	oauthStateString string = "random"
+    youtubeVideoURLPrefix string = "https://www.youtube.com/watch?v="
 )
 
 func YouTubeGET(w http.ResponseWriter, r *http.Request) {
@@ -74,9 +76,16 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				log.Fatalf("Error fetching playlist items: %v", err.Error())
 			}
 
+            model.PlaylistCreate(playlistId, "likes", userID)
+
 			for _, playlistItem := range playlistResponse.Items {
 				title := playlistItem.Snippet.Title
 				videoId := playlistItem.Snippet.ResourceId.VideoId
+                 videoURL := youtubeVideoURLPrefix + playlistItem.Snippet.ResourceId.VideoId
+                 if err != nil {
+                     log.Fatalf("Error while trying to build video URL: %v", err.Error())
+                 }
+                 model.VideoCreate(playlistItem.Id, playlistItem.Snippet.Title, videoURL, playlistItem.Snippet.PlaylistId)
 				fmt.Printf("%v, (%v)\r\n", title, videoId)
 			}
 
@@ -90,43 +99,43 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	callTwo := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
-	responseTwo, err := callTwo.Do()
-	if err != nil {
-		// The channels.list method call returned an error.
-		log.Fatalf("Error making API call to list channels: %v", err.Error())
-	}
-
-	for _, item := range responseTwo.Items {
-
-		fmt.Printf("Videos in playlsit --- %s, %s\r\n", item.Id, item.Snippet.Title)
-
-		nextPageToken := ""
-		for {
-			playlistItems := service.PlaylistItems.List("snippet,contentDetails").
-				PlaylistId(item.Id).MaxResults(50).PageToken(nextPageToken)
-
-			playlistResponse, err := playlistItems.Do()
-
-			if err != nil {
-				// The playlistItems.list method call returned an error.
-				log.Fatalf("Error fetching playlist items: %v", err.Error())
-			}
-
-			for _, playlistItem := range playlistResponse.Items {
-				title := playlistItem.Snippet.Title
-				videoId := playlistItem.Snippet.ResourceId.VideoId
-				fmt.Printf("%v, (%v)\r\n", title, videoId)
-			}
-
-			// Set the token to retrieve the next page of results
-			// or exit the loop if all results have been retrieved.
-			nextPageToken = playlistResponse.NextPageToken
-			if nextPageToken == "" {
-				break
-			}
-			fmt.Println()
-		}
-	}
+	//callTwo := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
+	//responseTwo, err := callTwo.Do()
+	//if err != nil {
+	//	// The channels.list method call returned an error.
+	//	log.Fatalf("Error making API call to list channels: %v", err.Error())
+	//}
+	//
+	//for _, item := range responseTwo.Items {
+	//
+	//	fmt.Printf("Videos in playlsit --- %s, %s\r\n", item.Id, item.Snippet.Title)
+	//
+	//	nextPageToken := ""
+	//	for {
+	//		playlistItems := service.PlaylistItems.List("snippet,contentDetails").
+	//			PlaylistId(item.Id).MaxResults(50).PageToken(nextPageToken)
+	//
+	//		playlistResponse, err := playlistItems.Do()
+	//
+	//		if err != nil {
+	//			// The playlistItems.list method call returned an error.
+	//			log.Fatalf("Error fetching playlist items: %v", err.Error())
+	//		}
+	//
+	//		for _, playlistItem := range playlistResponse.Items {
+	//			title := playlistItem.Snippet.Title
+	//			videoId := playlistItem.Snippet.ResourceId.VideoId
+	//			fmt.Printf("%v, (%v)\r\n", title, videoId)
+	//		}
+	//
+	//		// Set the token to retrieve the next page of results
+	//		// or exit the loop if all results have been retrieved.
+	//		nextPageToken = playlistResponse.NextPageToken
+	//		if nextPageToken == "" {
+	//			break
+	//		}
+	//		fmt.Println()
+	//	}
+	//}
 	http.Redirect(w, r, "/", http.StatusFound)
 }

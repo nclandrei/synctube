@@ -121,7 +121,7 @@ func VideoDelete(videoID string, playlistID string) error {
         video, err = VideoByID(videoID, playlistID)
         if err == nil {
             // Confirm the owner is attempting to modify the note
-            if video.VideoID().Hex() == videoID {
+            if video.VideoID() == videoID {
                 err = c.RemoveId(bson.ObjectIdHex(videoID))
             } else {
                 err = ErrUnauthorized
