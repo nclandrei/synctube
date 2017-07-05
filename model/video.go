@@ -12,21 +12,19 @@ import (
 
 // Video table contains the information for each Video per user
 type Video struct {
-    ObjectID    bson.ObjectId   `bson:"_id"`
+	ObjectID	   bson.ObjectId   `bson:"_id"`
     ID          string          `db:"id" bson:"id,omitempty"`
-    Title       string          `db:"content" bson:"content"`
-    URL         string          `db:"url" bson:"url"`
-    PlaylistID  string          `bson:"playlist_id"`
+    Title       string          `db:"title" bson:"title,omitempty"`
+    URL         string          `db:"url" bson:"url,omitempty"`
+    PlaylistID  string          `bson:"playlist_id,omitempty"`
 }
 
-// VideoID returns the video id
+// VideoID returns the video object id
 func (u *Video) VideoID() string {
-    r := ""
-    r = u.ObjectID.Hex()
-    return r
+    return u.ObjectID.Hex()
 }
 
-// VideoByID gets note by ID
+// VideoByID gets video in a given playlist
 func VideoByID(videoID string, playlistID string) (Video, error) {
 	var err error
 
@@ -38,25 +36,25 @@ func VideoByID(videoID string, playlistID string) (Video, error) {
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
 
+		// TODO - complete this so that it selects properly
+		//err = c.Find(bson.M{"$and" : [bson.M{"playlist_id" : playlistID}, bson.M{"id" : videoID}]}).One(&result)
+		err = c.Find(bson.ObjectIdHex(videoID)).One(&result)
+
 		// Validate the object id
-		if bson.IsObjectIdHex(videoID) {
-            // TODO - complete this so that it selects properly
-			//err = c.Find(bson.M{"$and" : [bson.M{"playlist_id" : playlistID}, bson.M{"id" : videoID}]}).One(&result)
-            err = c.FindId(bson.ObjectIdHex(videoID)).One(&result)
-			if err != nil {
-				result = Video{}
-				err = ErrUnauthorized
-			}
-		} else {
-			err = ErrNoResult
+		err = c.Find(bson.M{"user_id": videoID}).All(&result)
+
+		if err != nil {
+			result = Video{}
+			err = ErrUnauthorized
 		}
 	} else {
-        err = ErrUnavailable
+		err = ErrUnavailable
     }
+
 	return result, standardizeError(err)
 }
 
-// VideoByUserID gets all Videos for a user
+// VideoByPlaylistID gets all Videos for a user
 func VideoByPlaylistID(playlistID string) ([]Video, error) {
     var err error
 
@@ -70,7 +68,7 @@ func VideoByPlaylistID(playlistID string) ([]Video, error) {
 
         // Validate the object id
         if bson.IsObjectIdHex(playlistID) {
-            err = c.Find(bson.M{"playlist_id": bson.ObjectIdHex(playlistID)}).All(&result)
+            err = c.Find(bson.M{"playlist_id": playlistID}).All(&result)
         } else {
             err = ErrNoResult
         }
@@ -81,7 +79,7 @@ func VideoByPlaylistID(playlistID string) ([]Video, error) {
     return result, standardizeError(err)
 }
 
-// VideoCreate creates a note
+// VideoCreate creates a video
 func VideoCreate(id string, title string, url string, playlistID string) error {
     var err error
 
@@ -92,12 +90,12 @@ func VideoCreate(id string, title string, url string, playlistID string) error {
         c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
 
         Video := &Video{
-            ObjectID:   bson.NewObjectId(),
-            ID:         id,
-            Title:      title,
-            URL:        url,
-            PlaylistID: playlistID,
-        }
+			ObjectID:   bson.NewObjectId(),
+			ID:         id,
+			Title:      title,
+			URL:        url,
+			PlaylistID: playlistID,
+		}
         err = c.Insert(Video)
     } else {
         err = ErrUnavailable
@@ -121,7 +119,7 @@ func VideoDelete(videoID string, playlistID string) error {
         if err == nil {
             // Confirm the owner is attempting to modify the note
             if video.VideoID() == videoID {
-                err = c.RemoveId(bson.ObjectIdHex(videoID))
+                err = c.Remove(bson.M{"id": videoID})
             } else {
                 err = ErrUnauthorized
             }

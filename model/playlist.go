@@ -12,7 +12,7 @@ import (
 
 // Playlist table contains the information for each playlist per user
 type Playlist struct {
-	ObjectID  bson.ObjectId `bson:"_id"`
+	ObjectID	 bson.ObjectId  `bson:"_id"`
 	ID        string        `db:"id" bson:"id,omitempty"`
 	Title     string        `db:"title" bson:"title"`
 	UserID    bson.ObjectId `bson:"user_id"`
@@ -79,10 +79,9 @@ func PlaylistByUserID(userID string) ([]Playlist, error) {
 	return result, standardizeError(err)
 }
 
-// NoteCreate creates a note
+// PlaylistCreate creates a playlist
 func PlaylistCreate(id string, title string, userID string) error {
 	var err error
-
 
 	if database.CheckConnection() {
 		// Create a copy of mongo
@@ -104,7 +103,7 @@ func PlaylistCreate(id string, title string, userID string) error {
 	return standardizeError(err)
 }
 
-// NoteUpdate updates a note
+// PlaylistUpdate updates a playlist
 func PlaylistUpdate(content string, userID string, playlistID string) error {
 	var err error
 
