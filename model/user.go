@@ -15,15 +15,16 @@ import (
 
 // User table contains the information for each user
 type User struct {
-	ObjectID  		bson.ObjectId `bson:"_id"`
-	ID             	uint32        `db:"id" bson:"id,omitempty"` // Don't use Id, use UserID() instead for consistency with MongoDB
-	Email     		string        `db:"email" bson:"email"`
-	Password  		string        `db:"password" bson:"password"`
-	StatusID  		uint8         `db:"status_id" bson:"status_id"`
-	Token          oauth2.Token  `db:"token" bson:"token"`
-	CreatedAt 		time.Time     `db:"created_at" bson:"created_at"`
-	UpdatedAt 		time.Time     `db:"updated_at" bson:"updated_at"`
-	Deleted   		uint8         `db:"deleted" bson:"deleted"`
+	ObjectID  		bson.ObjectId  `bson:"_id"`
+	ID             	uint32         `db:"id" bson:"id,omitempty"` // Don't use Id, use UserID() instead for consistency with MongoDB
+	Email     		string         `db:"email" bson:"email"`
+	Password  		string         `db:"password" bson:"password"`
+	StatusID  		uint8          `db:"status_id" bson:"status_id"`
+	Token            oauth2.Token   `db:"token" bson:"token"`
+	CreatedAt 		time.Time      `db:"created_at" bson:"created_at"`
+	UpdatedAt 		time.Time      `db:"updated_at" bson:"updated_at"`
+	Deleted   		uint8          `db:"deleted" bson:"deleted"`
+    LastSync         time.Time      `db:"last_sync" bson:"last_sync"`
 }
 
 // UserStatus table contains every possible user status (active/inactive)

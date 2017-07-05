@@ -86,7 +86,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
                  if err != nil {
                      log.Fatalf("Error while trying to build video URL: %v", err.Error())
                  }
-                 model.VideoCreate(playlistItem.Id, playlistItem.Snippet.Title, videoURL, playlistItem.Snippet.PlaylistId)
+                 model.VideoCreate(videoId, playlistItem.Snippet.Title, videoURL, playlistItem.Snippet.PlaylistId)
 				fmt.Printf("%v, (%v)\r\n", title, videoId)
 			}
 
