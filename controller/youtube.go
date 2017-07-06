@@ -107,6 +107,8 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Videos in playlsit --- %s, %s\r\n", item.Id, item.Snippet.Title)
 
+		// isPlaylistNew will tell us if we should add all videos in the playlist to the database
+		// as the current PL is  completely new
 		var isPlaylistNew bool
 		playlist, _ := model.PlaylistByID(userID, item.Id)
 
