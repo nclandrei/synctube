@@ -96,14 +96,14 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Second call - will retrieve all items in user created playlists
-	callTwo := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
-	responseTwo, err := callTwo.Do()
+	userCreatedPlaylistService := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
+	userCreatedPlaylists, err := userCreatedPlaylistService.Do()
+
 	if err != nil {
-		// The channels.list method call returned an error.
 		log.Fatalf("Error making API call to list channels: %v", err.Error())
 	}
 
-	for _, item := range responseTwo.Items {
+	for _, item := range userCreatedPlaylists.Items {
 
 		fmt.Printf("Videos in playlsit --- %s, %s\r\n", item.Id, item.Snippet.Title)
 
@@ -150,6 +150,17 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			}
 			fmt.Println()
 		}
+		storedVideos, _ := model.VideoByPlaylistID(item.Id)
+		toAddVideos := diffPlaylistVideos(videos, storedVideos)
+		toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
+
+		for _, item := range toAddVideos {
+			model.VideoCreate(item.ID, item.Title, item.URL, item.PlaylistID)
+		}
+
+		for _, item := range toDeleteVideos {
+			model.VideoDelete(item.ID, item.PlaylistID)
+		}
 	}
 
 	// Finally, before redirecting to homepage, save the timestamp of the this sync
@@ -159,4 +170,32 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func diffPlaylistVideos(X, Y []model.Video) ([]model.Video) {
+	counts := make(map[model.Video]int)
+	var total int
+	for _, val := range X {
+		counts[val] += 1
+		total += 1
+	}
+
+	for _, val := range Y {
+		if count := counts[val]; count > 0 {
+			counts[val] -= 1
+			total -= 1
+		}
+
+	}
+
+	diff := make([]model.Video, total)
+	i := 0
+
+	for val, count := range counts {
+		for j := 0; j < count; j++ {
+			diff[i] = val
+			i++
+		}
+	}
+	return diff
 }
