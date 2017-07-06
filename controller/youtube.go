@@ -107,7 +107,14 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Videos in playlsit --- %s, %s\r\n", item.Id, item.Snippet.Title)
 
+		playlist, _ := model.PlaylistByID(userID, item.Id)
+
+		if playlist == (model.Playlist{}) {
+			model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
+		}
+
 		nextPageToken := ""
+		var videos []model.Video
 		for {
 			playlistItems := service.PlaylistItems.List("snippet,contentDetails").
 				PlaylistId(item.Id).MaxResults(50).PageToken(nextPageToken)
@@ -121,6 +128,17 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			for _, playlistItem := range playlistResponse.Items {
 				title := playlistItem.Snippet.Title
 				videoId := playlistItem.Snippet.ResourceId.VideoId
+				videoURL := youtubeVideoURLPrefix + playlistItem.Snippet.ResourceId.VideoId
+
+				currentVideo := model.Video{
+					ID: videoId,
+					Title: title,
+					URL: videoURL,
+					PlaylistID: playlistItem.Snippet.PlaylistId,
+				}
+
+				videos = append(videos, currentVideo)
+
 				fmt.Printf("%v, (%v)\r\n", title, videoId)
 			}
 

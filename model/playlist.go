@@ -18,7 +18,7 @@ type Playlist struct {
 	UserID    bson.ObjectId `bson:"user_id"`
 }
 
-// PlaylistID returns the note id
+// PlaylistID returns the playlist id
 func (u *Playlist) PlaylistID() string {
 	r := ""
 	r = u.ObjectID.Hex()
