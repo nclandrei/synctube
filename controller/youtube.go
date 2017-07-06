@@ -172,6 +172,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+// Function that returns the videos that are in first slice but not in the second one
 func diffPlaylistVideos(X, Y []model.Video) ([]model.Video) {
 	counts := make(map[model.Video]int)
 	var total int
