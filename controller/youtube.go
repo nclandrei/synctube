@@ -156,7 +156,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		var toAddVideos []model.Video
 
 		if !isPlaylistNew {
-			storedVideos, _ := model.VideoByPlaylistID(item.Id)
+			storedVideos, _ := model.VideosByPlaylistID(item.Id)
 			toAddVideos = diffPlaylistVideos(videos, storedVideos)
 			toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
 			for _, item := range toDeleteVideos {
