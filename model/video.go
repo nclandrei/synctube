@@ -55,7 +55,7 @@ func VideoByID(videoID string, playlistID string) (Video, error) {
 }
 
 // VideoByPlaylistID gets all Videos for a user
-func VideoByPlaylistID(playlistID string) ([]Video, error) {
+func VideosByPlaylistID(playlistID string) ([]Video, error) {
     var err error
 
     var result []Video
