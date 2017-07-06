@@ -107,10 +107,12 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Printf("Videos in playlsit --- %s, %s\r\n", item.Id, item.Snippet.Title)
 
+		var isPlaylistNew bool
 		playlist, _ := model.PlaylistByID(userID, item.Id)
 
 		if playlist == (model.Playlist{}) {
 			model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
+			isPlaylistNew = true
 		}
 
 		nextPageToken := ""
@@ -150,16 +152,22 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			}
 			fmt.Println()
 		}
-		storedVideos, _ := model.VideoByPlaylistID(item.Id)
-		toAddVideos := diffPlaylistVideos(videos, storedVideos)
-		toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
+
+		var toAddVideos []model.Video
+
+		if !isPlaylistNew {
+			storedVideos, _ := model.VideoByPlaylistID(item.Id)
+			toAddVideos = diffPlaylistVideos(videos, storedVideos)
+			toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
+			for _, item := range toDeleteVideos {
+				model.VideoDelete(item.ID, item.PlaylistID)
+			}
+		} else {
+			toAddVideos = videos
+		}
 
 		for _, item := range toAddVideos {
 			model.VideoCreate(item.ID, item.Title, item.URL, item.PlaylistID)
-		}
-
-		for _, item := range toDeleteVideos {
-			model.VideoDelete(item.ID, item.PlaylistID)
 		}
 	}
 
