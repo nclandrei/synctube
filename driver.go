@@ -15,7 +15,7 @@ import (
 	"github.com/nclandrei/YTSync/shared/session"
 	"github.com/nclandrei/YTSync/shared/view"
 	"github.com/nclandrei/YTSync/shared/view/plugin"
-	"github.com/nclandrei/YTSync/shared/ytsync"
+	"github.com/nclandrei/YTSync/shared/youtube/auth"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/youtube/v3"
 )
@@ -46,7 +46,7 @@ func main() {
 	recaptcha.Configure(localConfig.Recaptcha)
 
 	// Configure YouTube settings
-	ytsync.Configure(loadYTConfig(localConfig.YouTube))
+	auth.Configure(loadYTConfig(localConfig.YouTube))
 
 	// Setup the views
 	view.Configure(localConfig.View)
@@ -77,7 +77,7 @@ type configuration struct {
 	Session   session.Session `json:"Session"`
 	Template  view.Template   `json:"Template"`
 	View      view.View       `json:"View"`
-	YouTube   ytsync.YT       `json:"YouTube"`
+	YouTube   auth.YT       `json:"YouTube"`
 }
 
 // ParseJSON unmarshals bytes to structs
@@ -85,7 +85,7 @@ func (c *configuration) ParseJSON(b []byte) error {
 	return json.Unmarshal(b, &c)
 }
 
-func loadYTConfig(conf ytsync.YT) oauth2.Config {
+func loadYTConfig(conf auth.YT) oauth2.Config {
 	return oauth2.Config{
 		ClientID:     conf.ClientID,
 		ClientSecret: conf.ClientSecret,

@@ -1,4 +1,4 @@
-package ytsync
+package auth
 
 import (
 	"golang.org/x/oauth2"
@@ -45,8 +45,8 @@ func GetClient (ctx context.Context, code string, userId string) *http.Client {
 
 // GetAuthorizationURL - uses Config to request a Token.
 func GetAuthorizationURL() string {
-	authURL := ytConfig.AuthCodeURL("random", oauth2.AccessTypeOffline)
-	return authURL
+	url := ytConfig.AuthCodeURL("random", oauth2.AccessTypeOffline)
+	return url
 }
 
 // GetTokenFromWeb - given an authorization code it returns the token from a page
