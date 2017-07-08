@@ -12,10 +12,10 @@ import (
 
 // Playlist table contains the information for each playlist per user
 type Playlist struct {
-	ObjectID	 bson.ObjectId  `bson:"_id"`
-	ID        string        `db:"id" bson:"id,omitempty"`
-	Title     string        `db:"title" bson:"title"`
-	UserID    bson.ObjectId `bson:"user_id"`
+	ObjectID bson.ObjectId `bson:"_id"`
+	ID       string        `db:"id" bson:"id"`
+	Title    string        `db:"title" bson:"title"`
+	UserID   bson.ObjectId `bson:"user_id"`
 }
 
 // PlaylistID returns the playlist id
@@ -25,8 +25,8 @@ func (u *Playlist) PlaylistID() string {
 	return r
 }
 
-// PlaylistByID gets note by ID
-func PlaylistByID(userID string, playlistID string) (Playlist, error) {
+// PlaylistByID gets playlist by ID
+func PlaylistByID(playlistID string, userID string) (Playlist, error) {
 	var err error
 
 	result := Playlist{}
@@ -36,17 +36,7 @@ func PlaylistByID(userID string, playlistID string) (Playlist, error) {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("playlist")
-
-		// Validate the object id
-		if bson.IsObjectIdHex(playlistID) {
-			err = c.FindId(bson.ObjectIdHex(playlistID)).One(&result)
-			if result.UserID != bson.ObjectIdHex(userID) {
-				result = Playlist{}
-				err = ErrUnauthorized
-			}
-		} else {
-			err = ErrNoResult
-		}
+		err = c.Find(bson.M{"id": playlistID}).One(&result)
 	} else {
 		err = ErrUnavailable
 	}
@@ -87,14 +77,14 @@ func PlaylistCreate(id string, title string, userID string) error {
 		// Create a copy of mongo
 		session := database.Mongo.Copy()
 		defer session.Close()
-        c := session.DB(database.ReadConfig().MongoDB.Database).C("playlist")
+		c := session.DB(database.ReadConfig().MongoDB.Database).C("playlist")
 
-        playlist := &Playlist{
-            ObjectID:  bson.NewObjectId(),
-            ID:        id,
-            Title:     title,
-            UserID:    bson.ObjectIdHex(userID),
-        }
+		playlist := &Playlist{
+			ObjectID: bson.NewObjectId(),
+			ID:       id,
+			Title:    title,
+			UserID:   bson.ObjectIdHex(userID),
+		}
 		err = c.Insert(playlist)
 	} else {
 		err = ErrUnavailable

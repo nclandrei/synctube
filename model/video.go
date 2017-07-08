@@ -1,8 +1,6 @@
 package model
 
 import (
-	"log"
-
 	"github.com/nclandrei/YTSync/shared/database"
 
 	"gopkg.in/mgo.v2/bson"
@@ -16,9 +14,9 @@ import (
 type Video struct {
 	ObjectID   bson.ObjectId `bson:"_id"`
 	ID         string        `db:"id" bson:"id,omitempty"`
-	Title      string        `db:"title" bson:"title,omitempty"`
-	URL        string        `db:"url" bson:"url,omitempty"`
-	PlaylistID string        `bson:"playlist_id,omitempty"`
+	Title      string        `db:"title" bson:"title"`
+	URL        string        `db:"url" bson:"url"`
+	PlaylistID string        `bson:"playlist_id"`
 }
 
 // VideoID returns the video object id
@@ -40,8 +38,6 @@ func VideoByID(videoID string, playlistID string) (Video, error) {
 
 		// err = c.Find(bson.M{"$and" : [{bson.M{"playlist_id" : playlistID}}, {bson.M{"id" : videoID}]}).One(&result)
 		err = c.Find(bson.ObjectIdHex(videoID)).One(&result)
-
-		log.Printf("got here!!! found value: %v", result.Title)
 
 		// Validate the object id
 		err = c.Find(bson.M{"user_id": videoID}).All(&result)
@@ -68,13 +64,7 @@ func VideosByPlaylistID(playlistID string) ([]Video, error) {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
-
-		if bson.IsObjectIdHex(playlistID) {
-			err = c.Find(bson.M{"playlist_id": playlistID}).All(&result)
-			log.Printf("video array size is: %d", len(result))
-		} else {
-			err = ErrNoResult
-		}
+		err = c.Find(bson.M{"playlist_id": playlistID}).All(&result)
 	} else {
 		err = ErrUnavailable
 	}
