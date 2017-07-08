@@ -104,15 +104,19 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	for _, item := range userCreatedPlaylists.Items {
 		var isPlaylistNew bool
-		playlist, _ := model.PlaylistByID(item.Id, userID)
 
-		if playlist == (model.Playlist{}) {
+		_, err := model.PlaylistByID(item.Id, userID)
+
+		if err == model.ErrNoResult {
+			log.Printf("Could not find playlist in database - will create a new one.")
+			isPlaylistNew = true
 			err := model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
 			if err != nil {
 				log.Fatalf("Error creating playlist: %v", err.Error())
 			}
-			isPlaylistNew = true
 			log.Printf("created playlist - %v, %v", item.Snippet.Title, userID)
+		} else {
+			log.Fatalf("Error fetching playlist from the database: %v", err.Error())
 		}
 
 		nextPageToken := ""

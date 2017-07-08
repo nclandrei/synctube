@@ -13,7 +13,7 @@ import (
 // Playlist table contains the information for each playlist per user
 type Playlist struct {
 	ObjectID bson.ObjectId `bson:"_id"`
-	ID       string        `db:"id" bson:"id,omitempty"`
+	ID       string        `db:"id" bson:"id"`
 	Title    string        `db:"title" bson:"title"`
 	UserID   bson.ObjectId `bson:"user_id"`
 }
@@ -36,17 +36,7 @@ func PlaylistByID(playlistID string, userID string) (Playlist, error) {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("playlist")
-
-		// Validate the object id
-		if bson.IsObjectIdHex(playlistID) {
-			err = c.Find(bson.M{"id": playlistID}).One(&result)
-			if err != nil {
-				result = Playlist{}
-				err = ErrUnauthorized
-			}
-		} else {
-			err = ErrNoResult
-		}
+		err = c.Find(bson.M{"id": playlistID}).One(&result)
 	} else {
 		err = ErrUnavailable
 	}
