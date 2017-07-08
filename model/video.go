@@ -1,8 +1,6 @@
 package model
 
 import (
-	"log"
-
 	"github.com/nclandrei/YTSync/shared/database"
 
 	"gopkg.in/mgo.v2/bson"
@@ -66,9 +64,7 @@ func VideosByPlaylistID(playlistID string) ([]Video, error) {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
-
 		err = c.Find(bson.M{"playlist_id": playlistID}).All(&result)
-		log.Printf("video array size is: %d", len(result))
 	} else {
 		err = ErrUnavailable
 	}
