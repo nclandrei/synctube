@@ -69,12 +69,8 @@ func VideosByPlaylistID(playlistID string) ([]Video, error) {
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
 
-		if bson.IsObjectIdHex(playlistID) {
-			err = c.Find(bson.M{"playlist_id": playlistID}).All(&result)
-			log.Printf("video array size is: %d", len(result))
-		} else {
-			err = ErrNoResult
-		}
+		err = c.Find(bson.M{"playlist_id": playlistID}).All(&result)
+		log.Printf("video array size is: %d", len(result))
 	} else {
 		err = ErrUnavailable
 	}

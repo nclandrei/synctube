@@ -103,14 +103,12 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, item := range userCreatedPlaylists.Items {
-
-		fmt.Printf("Videos in playlsit --- %s, %s\r\n", item.Id, item.Snippet.Title)
-
 		var isPlaylistNew bool
 		playlist, _ := model.PlaylistByID(userID, item.Id)
 
 		if playlist == (model.Playlist{}) {
 			model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
+			fmt.Printf("first item ID: %v", item.Id)
 			isPlaylistNew = true
 			log.Printf("created playlist - %v, %v", item.Snippet.Title, userID)
 		}
@@ -139,6 +137,8 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 					PlaylistID: playlistItem.Snippet.PlaylistId,
 				}
 
+				fmt.Printf("second item ID: %v", videoURL.PlaylistID)
+
 				videos = append(videos, currentVideo)
 
 				log.Printf("returned video - %v, %v", title, videoId)
@@ -165,6 +165,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				model.VideoDelete(item.ID, item.PlaylistID)
 			}
 		} else {
+			log.Printf("always here....")
 			toAddVideos = videos
 		}
 
@@ -188,6 +189,7 @@ func diffPlaylistVideos(X, Y []model.Video) []model.Video {
 	log.Printf("XXXXXXXXXXXXXXXXXX")
 	counts := make(map[model.Video]int)
 	var total int
+
 	for _, val := range X {
 		counts[val] += 1
 		total += 1
@@ -198,7 +200,6 @@ func diffPlaylistVideos(X, Y []model.Video) []model.Video {
 			counts[val] -= 1
 			total -= 1
 		}
-
 	}
 
 	diff := make([]model.Video, total)
