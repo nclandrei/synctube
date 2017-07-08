@@ -115,7 +115,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				log.Fatalf("Error creating playlist: %v", err.Error())
 			}
 			log.Printf("created playlist - %v, %v", item.Snippet.Title, userID)
-		} else {
+		} else if err != model.ErrNoResult && err != nil {
 			log.Fatalf("Error fetching playlist from the database: %v", err.Error())
 		}
 
@@ -165,7 +165,10 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("this is the list of videos: %v", videos)
 
 		if !isPlaylistNew {
-			storedVideos, _ := model.VideosByPlaylistID(item.Id)
+			storedVideos, err := model.VideosByPlaylistID(item.Id)
+			if err != nil {
+				log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
+			}
 			toAddVideos = diffPlaylistVideos(videos, storedVideos)
 			toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
 			for _, item := range toDeleteVideos {
