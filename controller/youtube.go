@@ -155,6 +155,8 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 		var toAddVideos []model.Video
 
+		fmt.Printf("this is the list of videos: %v", videos)
+
 		if !isPlaylistNew {
 			storedVideos, _ := model.VideosByPlaylistID(item.Id)
 			toAddVideos = diffPlaylistVideos(videos, storedVideos)
