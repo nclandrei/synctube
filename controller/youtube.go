@@ -104,17 +104,20 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	for _, item := range userCreatedPlaylists.Items {
 		var isPlaylistNew bool
-		playlist, _ := model.PlaylistByID(userID, item.Id)
+		playlist, _ := model.PlaylistByID(item.Id, userID)
 
 		if playlist == (model.Playlist{}) {
-			model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
-			fmt.Printf("first item ID: %v", item.Id)
+			err := model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
+			if err != nil {
+				log.Fatalf("Error creating playlist: %v", err.Error())
+			}
 			isPlaylistNew = true
 			log.Printf("created playlist - %v, %v", item.Snippet.Title, userID)
 		}
 
 		nextPageToken := ""
 		var videos []model.Video
+
 		for {
 			playlistItems := service.PlaylistItems.List("snippet,contentDetails").
 				PlaylistId(item.Id).MaxResults(50).PageToken(nextPageToken)
@@ -137,7 +140,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 					PlaylistID: playlistItem.Snippet.PlaylistId,
 				}
 
-				fmt.Printf("second item ID: %v", videoURL.PlaylistID)
+				fmt.Printf("second item ID: %v", playlistItem.Snippet.PlaylistId)
 
 				videos = append(videos, currentVideo)
 

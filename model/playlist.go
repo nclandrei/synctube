@@ -25,8 +25,8 @@ func (u *Playlist) PlaylistID() string {
 	return r
 }
 
-// PlaylistByID gets note by ID
-func PlaylistByID(userID string, playlistID string) (Playlist, error) {
+// PlaylistByID gets playlist by ID
+func PlaylistByID(playlistID string, userID string) (Playlist, error) {
 	var err error
 
 	result := Playlist{}
