@@ -1,21 +1,21 @@
 package controller
 
 import (
+	"context"
 	"fmt"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/nclandrei/YTSync/model"
+	"github.com/nclandrei/YTSync/shared/session"
 	"github.com/nclandrei/YTSync/shared/youtube/auth"
 	"google.golang.org/api/youtube/v3"
-	"net/http"
-	"context"
-	"github.com/nclandrei/YTSync/shared/session"
-	//"log"
-	"log"
-    "github.com/nclandrei/YTSync/model"
-	"time"
 )
 
 const (
-	oauthStateString string = "random"
-    youtubeVideoURLPrefix string = "https://www.youtube.com/watch?v="
+	oauthStateString      string = "random"
+	youtubeVideoURLPrefix string = "https://www.youtube.com/watch?v="
 )
 
 func YouTubeGET(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +58,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		// Print the playlist ID for the list of uploaded videos.
 		fmt.Printf("Videos in list %s\r\n", playlistId)
 
-        model.PlaylistCreate(playlistId, "likes", userID)
+		model.PlaylistCreate(playlistId, "likes", userID)
 
 		nextPageToken := ""
 		for {
@@ -73,16 +73,15 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				log.Fatalf("Error fetching playlist items: %v", err.Error())
 			}
 
-
 			for _, playlistItem := range playlistResponse.Items {
 				title := playlistItem.Snippet.Title
 				videoId := playlistItem.Snippet.ResourceId.VideoId
-                 videoURL := youtubeVideoURLPrefix + playlistItem.Snippet.ResourceId.VideoId
-                 if err != nil {
-                     log.Fatalf("Error while trying to build video URL: %v", err.Error())
-                 }
-                 model.VideoCreate(videoId, playlistItem.Snippet.Title, videoURL, playlistItem.Snippet.PlaylistId)
-				fmt.Printf("%v, (%v)\r\n", title, videoId)
+				videoURL := youtubeVideoURLPrefix + playlistItem.Snippet.ResourceId.VideoId
+				if err != nil {
+					log.Fatalf("Error while trying to build video URL: %v", err.Error())
+				}
+				model.VideoCreate(videoId, playlistItem.Snippet.Title, videoURL, playlistItem.Snippet.PlaylistId)
+				log.Printf("returned video - %v, %v", title, videoId)
 			}
 
 			// Set the token to retrieve the next page of results
@@ -113,6 +112,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		if playlist == (model.Playlist{}) {
 			model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
 			isPlaylistNew = true
+			log.Printf("created playlist - %v, %v", item.Snippet.Title, userID)
 		}
 
 		nextPageToken := ""
@@ -133,15 +133,15 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				videoURL := youtubeVideoURLPrefix + playlistItem.Snippet.ResourceId.VideoId
 
 				currentVideo := model.Video{
-					ID: videoId,
-					Title: title,
-					URL: videoURL,
+					ID:         videoId,
+					Title:      title,
+					URL:        videoURL,
 					PlaylistID: playlistItem.Snippet.PlaylistId,
 				}
 
 				videos = append(videos, currentVideo)
 
-				fmt.Printf("%v, (%v)\r\n", title, videoId)
+				log.Printf("returned video - %v, %v", title, videoId)
 			}
 
 			// Set the token to retrieve the next page of results
@@ -168,6 +168,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 		for _, item := range toAddVideos {
 			model.VideoCreate(item.ID, item.Title, item.URL, item.PlaylistID)
+			log.Printf("adding item with title '%v' to mongo", item.Title)
 		}
 	}
 
@@ -181,7 +182,8 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 }
 
 // Function that returns the videos that are in first slice but not in the second one
-func diffPlaylistVideos(X, Y []model.Video) ([]model.Video) {
+func diffPlaylistVideos(X, Y []model.Video) []model.Video {
+	log.Printf("XXXXXXXXXXXXXXXXXX")
 	counts := make(map[model.Video]int)
 	var total int
 	for _, val := range X {
