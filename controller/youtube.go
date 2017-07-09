@@ -1,3 +1,6 @@
+// TODO: add number of videos and some sort of display for video information on auth template
+// TODO: add email verification for new user accounts
+
 package controller
 
 import (
@@ -10,12 +13,12 @@ import (
 	"github.com/nclandrei/YTSync/model"
 	"github.com/nclandrei/YTSync/shared/session"
 	"github.com/nclandrei/YTSync/shared/youtube/auth"
+	"github.com/nclandrei/YTSync/shared/youtube/downloader"
 	"google.golang.org/api/youtube/v3"
 )
 
 const (
-	oauthStateString      string = "random"
-	youtubeVideoURLPrefix string = "https://www.youtube.com/watch?v="
+	oauthStateString string = "random"
 )
 
 func YouTubeGET(w http.ResponseWriter, r *http.Request) {
@@ -54,13 +57,28 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, channel := range response.Items {
+		var isPlaylistNew bool
 		playlistId := channel.ContentDetails.RelatedPlaylists.Likes
+
 		// Print the playlist ID for the list of uploaded videos.
 		fmt.Printf("Videos in list %s\r\n", playlistId)
 
-		model.PlaylistCreate(playlistId, "likes", userID)
+		_, err := model.PlaylistByID(playlistId, userID)
+
+		if err == model.ErrNoResult {
+			isPlaylistNew = true
+			err := model.PlaylistCreate(playlistId, "Likes", userID)
+			if err != nil {
+				log.Fatalf("Error creating playlist: %v", err.Error())
+			}
+			log.Printf("Added Likes playlist for user ID %v", userID)
+		} else if err != model.ErrNoResult && err != nil {
+			log.Fatalf("Error fetching Likes playlist from the database: %v", err.Error())
+		}
 
 		nextPageToken := ""
+		var videos []model.Video
+
 		for {
 			playlistCall := service.PlaylistItems.List("snippet").
 				PlaylistId(playlistId).
@@ -76,22 +94,51 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			for _, playlistItem := range playlistResponse.Items {
 				title := playlistItem.Snippet.Title
 				videoId := playlistItem.Snippet.ResourceId.VideoId
-				videoURL := youtubeVideoURLPrefix + playlistItem.Snippet.ResourceId.VideoId
-				if err != nil {
-					log.Fatalf("Error while trying to build video URL: %v", err.Error())
+
+				video := model.Video{
+					ID:         videoId,
+					Title:      title,
+					PlaylistID: playlistId,
 				}
-				model.VideoCreate(videoId, playlistItem.Snippet.Title, videoURL, playlistItem.Snippet.PlaylistId)
-				log.Printf("returned video - %v, %v", title, videoId)
+
+				videos = append(videos, video)
+				log.Printf("New video with title: %v and id: %v", title, videoId)
 			}
 
 			// Set the token to retrieve the next page of results
 			// or exit the loop if all results have been retrieved.
 			nextPageToken = playlistResponse.NextPageToken
+
 			if nextPageToken == "" {
 				break
 			}
 			fmt.Println()
 		}
+
+		var toAddVideos []model.Video
+
+		if !isPlaylistNew {
+			storedVideos, err := model.VideosByPlaylistID(playlistId)
+			if err != nil {
+				log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
+			}
+			toAddVideos = diffPlaylistVideos(videos, storedVideos)
+			toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
+			for _, item := range toDeleteVideos {
+				model.VideoDelete(item.ID, item.PlaylistID)
+			}
+		} else {
+			toAddVideos = videos
+		}
+
+		for _, item := range toAddVideos {
+			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+			if err != nil {
+				log.Fatalf("Error adding the video to the database: %v", err.Error())
+			}
+			log.Printf("adding item with title '%v' to mongo", item.Title)
+		}
+
 	}
 
 	// Second call - will retrieve all items in user created playlists
@@ -135,20 +182,16 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			for _, playlistItem := range playlistResponse.Items {
 				title := playlistItem.Snippet.Title
 				videoId := playlistItem.Snippet.ResourceId.VideoId
-				videoURL := youtubeVideoURLPrefix + playlistItem.Snippet.ResourceId.VideoId
 
 				currentVideo := model.Video{
 					ID:         videoId,
 					Title:      title,
-					URL:        videoURL,
 					PlaylistID: playlistItem.Snippet.PlaylistId,
 				}
 
-				fmt.Printf("second item ID: %v", playlistItem.Snippet.PlaylistId)
-
 				videos = append(videos, currentVideo)
 
-				log.Printf("returned video - %v, %v", title, videoId)
+				log.Printf("New video with title: %v and id: %v", title, videoId)
 			}
 
 			// Set the token to retrieve the next page of results
@@ -162,8 +205,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 		var toAddVideos []model.Video
 
-		fmt.Printf("this is the list of videos: %v", videos)
-
 		if !isPlaylistNew {
 			storedVideos, err := model.VideosByPlaylistID(item.Id)
 			if err != nil {
@@ -175,16 +216,19 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				model.VideoDelete(item.ID, item.PlaylistID)
 			}
 		} else {
-			log.Printf("always here....")
 			toAddVideos = videos
 		}
 
 		for _, item := range toAddVideos {
-			err := model.VideoCreate(item.ID, item.Title, item.URL, item.PlaylistID)
+			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
 			if err != nil {
 				log.Fatalf("Error adding the video to the database: %v", err.Error())
 			}
-			log.Printf("adding item with title '%v' to mongo", item.Title)
+			log.Printf("Added item with title '%v' to database", item.Title)
+			err = downloader.DownloadYouTubeVideo(item.ID)
+			if err != nil {
+				log.Fatalf("Error downloading video with ID %v from YouTube - %v", item.ID, err.Error())
+			}
 		}
 	}
 
