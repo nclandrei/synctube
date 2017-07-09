@@ -30,9 +30,7 @@ func VideoByID(videoID string, playlistID string) (Video, error) {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
-
-		err = c.Find(bson.M{"$and" : [{bson.M{"playlist_id" : playlistID}}, {bson.M{"id" : videoID}}]}).One(&result)
-		err = c.Find(bson.ObjectIdHex(videoID)).One(&result)
+		err = c.Find(bson.M{"$and": []bson.M{bson.M{"id": videoID}, bson.M{"playlist_id": playlistID}}}).One(&result)
 
 		if err != nil {
 			result = Video{}
