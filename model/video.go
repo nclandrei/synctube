@@ -101,7 +101,7 @@ func VideoDelete(videoID string, playlistID string) error {
 
 		if err == nil {
 			// Confirm the owner is attempting to modify the note
-			if video.VideoID() == videoID && video.PlaylistID == playlistID {
+			if video.ID == videoID && video.PlaylistID == playlistID {
 				err = c.Remove(bson.M{"id": videoID})
 			} else {
 				err = ErrUnauthorized
