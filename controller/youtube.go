@@ -211,8 +211,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 		var toAddVideos []model.Video
 
-		fmt.Printf("this is the list of videos: %v", videos)
-
 		if !isPlaylistNew {
 			storedVideos, err := model.VideosByPlaylistID(item.Id)
 			if err != nil {
@@ -224,7 +222,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				model.VideoDelete(item.ID, item.PlaylistID)
 			}
 		} else {
-			log.Printf("always here....")
 			toAddVideos = videos
 		}
 
