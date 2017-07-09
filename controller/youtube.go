@@ -1,5 +1,4 @@
 // TODO: add number of videos and some sort of display for video information on auth template
-// TODO: try to download a video using a url in the database
 // TODO: add email verification for new user accounts
 
 package controller
@@ -19,8 +18,7 @@ import (
 )
 
 const (
-	oauthStateString      string = "random"
-	youtubeVideoURLPrefix string = "https://www.youtube.com/watch?v="
+	oauthStateString string = "random"
 )
 
 func YouTubeGET(w http.ResponseWriter, r *http.Request) {
@@ -96,12 +94,10 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			for _, playlistItem := range playlistResponse.Items {
 				title := playlistItem.Snippet.Title
 				videoId := playlistItem.Snippet.ResourceId.VideoId
-				videoURL := youtubeVideoURLPrefix + playlistItem.Snippet.ResourceId.VideoId
 
 				video := model.Video{
 					ID:         videoId,
 					Title:      title,
-					URL:        videoURL,
 					PlaylistID: playlistId,
 				}
 
@@ -136,7 +132,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, item := range toAddVideos {
-			err := model.VideoCreate(item.ID, item.Title, item.URL, item.PlaylistID)
+			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
 			if err != nil {
 				log.Fatalf("Error adding the video to the database: %v", err.Error())
 			}
@@ -186,12 +182,10 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			for _, playlistItem := range playlistResponse.Items {
 				title := playlistItem.Snippet.Title
 				videoId := playlistItem.Snippet.ResourceId.VideoId
-				videoURL := youtubeVideoURLPrefix + playlistItem.Snippet.ResourceId.VideoId
 
 				currentVideo := model.Video{
 					ID:         videoId,
 					Title:      title,
-					URL:        videoURL,
 					PlaylistID: playlistItem.Snippet.PlaylistId,
 				}
 
@@ -226,12 +220,12 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, item := range toAddVideos {
-			err := model.VideoCreate(item.ID, item.Title, item.URL, item.PlaylistID)
+			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
 			if err != nil {
 				log.Fatalf("Error adding the video to the database: %v", err.Error())
 			}
 			log.Printf("Added item with title '%v' to database", item.Title)
-			err = downloader.DownloadYouTubeVideo(item.URL)
+			err = downloader.DownloadYouTubeVideo(item.ID)
 			if err != nil {
 				log.Fatalf("Error downloading video with ID %v from YouTube - %v", item.ID, err.Error())
 			}

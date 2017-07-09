@@ -15,7 +15,6 @@ type Video struct {
 	ObjectID   bson.ObjectId `bson:"_id"`
 	ID         string        `db:"id" bson:"id,omitempty"`
 	Title      string        `db:"title" bson:"title"`
-	URL        string        `db:"url" bson:"url"`
 	PlaylistID string        `bson:"playlist_id"`
 }
 
@@ -62,7 +61,7 @@ func VideosByPlaylistID(playlistID string) ([]Video, error) {
 }
 
 // VideoCreate creates a video
-func VideoCreate(id string, title string, url string, playlistID string) error {
+func VideoCreate(id string, title string, playlistID string) error {
 	var err error
 
 	if database.CheckConnection() {
@@ -75,7 +74,6 @@ func VideoCreate(id string, title string, url string, playlistID string) error {
 			ObjectID:   bson.NewObjectId(),
 			ID:         id,
 			Title:      title,
-			URL:        url,
 			PlaylistID: playlistID,
 		}
 		err = c.Insert(Video)
