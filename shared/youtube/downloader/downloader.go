@@ -14,9 +14,10 @@ const (
 )
 
 func DownloadYouTubeVideo(url string) error {
-	fullUrl := fmt.Sprintf("%v%v", youtubePrefix, url)
-	log.Printf("THIS IS THE URL: %v", fullUrl)
-	cmd := exec.Command(youtubeDownloadCmd, extractAudio, audioFormat, fullUrl)
-	err := cmd.Run()
+	fullURL := fmt.Sprintf("%v%v", youtubePrefix, url)
+	cmd := youtubeDownloadCmd
+	args := []string{extractAudio, audioFormat, fullURL}
+	log.Printf("THIS IS THE COMMAND: %v", exec.Command(cmd, args...))
+	err := exec.Command(cmd, args...).Run()
 	return err
 }
