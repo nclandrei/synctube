@@ -171,7 +171,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			}
 			toAddVideos = diffPlaylistVideos(videos, storedVideos)
 			toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
-			log.Printf("size of add videos is - %v and of delete videos is - %v", len(toAddVideos), len(toDeleteVideos))
 			for _, item := range toDeleteVideos {
 				model.VideoDelete(item.ID, item.PlaylistID)
 			}
@@ -200,21 +199,32 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 // Function that returns the videos that are in first slice but not in the second one
 func diffPlaylistVideos(X, Y []model.Video) []model.Video {
-	diffVideos := []model.Video{}
-	m := map[model.Video]int{}
+	var resultSlice []model.Video
+	m := make(map[string]int)
 
-	for _, s1Val := range X {
-		m[s1Val] = 1
-	}
-	for _, s2Val := range Y {
-		m[s2Val] = m[s2Val] + 1
+	for _, y := range Y {
+		m[y.ID]++
 	}
 
-	for mKey, mVal := range m {
-		if mVal == 1 {
-			diffVideos = append(diffVideos, mKey)
+	for _, x := range X {
+		if m[x.ID] > 0 {
+			m[x.ID]--
+			continue
+		}
+		video := getVideoByIdFromSlice(X, x.ID)
+		if video != (model.Video{}) {
+			resultSlice = append(resultSlice, x)
 		}
 	}
 
-	return diffVideos
+	return resultSlice
+}
+
+func getVideoByIdFromSlice(x []model.Video, id string) model.Video {
+	for _, item := range x {
+		if item.ID == id {
+			return item
+		}
+	}
+	return model.Video{}
 }
