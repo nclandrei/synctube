@@ -77,7 +77,7 @@ type configuration struct {
 	Session   session.Session `json:"Session"`
 	Template  view.Template   `json:"Template"`
 	View      view.View       `json:"View"`
-	YouTube   auth.YT       `json:"YouTube"`
+	YouTube   auth.YT         `json:"YouTube"`
 }
 
 // ParseJSON unmarshals bytes to structs
@@ -91,7 +91,7 @@ func loadYTConfig(conf auth.YT) oauth2.Config {
 		ClientSecret: conf.ClientSecret,
 		Scopes:       []string{youtube.YoutubeReadonlyScope},
 		RedirectURL:  conf.RedirectURI[0],
-		Endpoint: oauth2.Endpoint {
+		Endpoint: oauth2.Endpoint{
 			AuthURL:  conf.AuthURI,
 			TokenURL: conf.TokenURI,
 		},
