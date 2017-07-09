@@ -14,6 +14,7 @@ import (
 	"github.com/nclandrei/YTSync/model"
 	"github.com/nclandrei/YTSync/shared/session"
 	"github.com/nclandrei/YTSync/shared/youtube/auth"
+	"github.com/nclandrei/YTSync/shared/youtube/downloader"
 	"google.golang.org/api/youtube/v3"
 )
 
@@ -232,7 +233,11 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Fatalf("Error adding the video to the database: %v", err.Error())
 			}
-			log.Printf("adding item with title '%v' to mongo", item.Title)
+			log.Printf("Added item with title '%v' to database", item.Title)
+			err = downloader.DownloadYouTubeVideo(item.URL)
+			if err != nil {
+				log.Fatalf("Error downloading video with ID %v from YouTube - %v", item.ID, err.Error())
+			}
 		}
 	}
 
