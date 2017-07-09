@@ -103,22 +103,25 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, item := range userCreatedPlaylists.Items {
-
-		fmt.Printf("Videos in playlsit --- %s, %s\r\n", item.Id, item.Snippet.Title)
-
-		// isPlaylistNew will tell us if we should add all videos in the playlist to the database
-		// as the current PL is  completely new
 		var isPlaylistNew bool
-		playlist, _ := model.PlaylistByID(userID, item.Id)
 
-		if playlist == (model.Playlist{}) {
-			model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
+		_, err := model.PlaylistByID(item.Id, userID)
+
+		if err == model.ErrNoResult {
+			log.Printf("Could not find playlist in database - will create a new one.")
 			isPlaylistNew = true
+			err := model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
+			if err != nil {
+				log.Fatalf("Error creating playlist: %v", err.Error())
+			}
 			log.Printf("created playlist - %v, %v", item.Snippet.Title, userID)
+		} else if err != model.ErrNoResult && err != nil {
+			log.Fatalf("Error fetching playlist from the database: %v", err.Error())
 		}
 
 		nextPageToken := ""
 		var videos []model.Video
+
 		for {
 			playlistItems := service.PlaylistItems.List("snippet,contentDetails").
 				PlaylistId(item.Id).MaxResults(50).PageToken(nextPageToken)
@@ -141,6 +144,8 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 					PlaylistID: playlistItem.Snippet.PlaylistId,
 				}
 
+				fmt.Printf("second item ID: %v", playlistItem.Snippet.PlaylistId)
+
 				videos = append(videos, currentVideo)
 
 				log.Printf("returned video - %v, %v", title, videoId)
@@ -157,19 +162,29 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 		var toAddVideos []model.Video
 
+		fmt.Printf("this is the list of videos: %v", videos)
+
 		if !isPlaylistNew {
-			storedVideos, _ := model.VideoByPlaylistID(item.Id)
+			storedVideos, err := model.VideosByPlaylistID(item.Id)
+			if err != nil {
+				log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
+			}
 			toAddVideos = diffPlaylistVideos(videos, storedVideos)
 			toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
+			log.Printf("size of add videos is - %v and of delete videos is - %v", len(toAddVideos), len(toDeleteVideos))
 			for _, item := range toDeleteVideos {
 				model.VideoDelete(item.ID, item.PlaylistID)
 			}
 		} else {
+			log.Printf("always here....")
 			toAddVideos = videos
 		}
 
 		for _, item := range toAddVideos {
-			model.VideoCreate(item.ID, item.Title, item.URL, item.PlaylistID)
+			err := model.VideoCreate(item.ID, item.Title, item.URL, item.PlaylistID)
+			if err != nil {
+				log.Fatalf("Error adding the video to the database: %v", err.Error())
+			}
 			log.Printf("adding item with title '%v' to mongo", item.Title)
 		}
 	}
@@ -185,30 +200,21 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 // Function that returns the videos that are in first slice but not in the second one
 func diffPlaylistVideos(X, Y []model.Video) []model.Video {
-	log.Printf("XXXXXXXXXXXXXXXXXX")
-	counts := make(map[model.Video]int)
-	var total int
-	for _, val := range X {
-		counts[val] += 1
-		total += 1
+	diffVideos := []model.Video{}
+	m := map[model.Video]int{}
+
+	for _, s1Val := range X {
+		m[s1Val] = 1
+	}
+	for _, s2Val := range Y {
+		m[s2Val] = m[s2Val] + 1
 	}
 
-	for _, val := range Y {
-		if count := counts[val]; count > 0 {
-			counts[val] -= 1
-			total -= 1
-		}
-
-	}
-
-	diff := make([]model.Video, total)
-	i := 0
-
-	for val, count := range counts {
-		for j := 0; j < count; j++ {
-			diff[i] = val
-			i++
+	for mKey, mVal := range m {
+		if mVal == 1 {
+			diffVideos = append(diffVideos, mKey)
 		}
 	}
-	return diff
+
+	return diffVideos
 }
