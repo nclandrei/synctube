@@ -1,3 +1,7 @@
+// TODO: add number of videos and some sort of display for video information on auth template
+// TODO: try to download a video using a url in the database
+// TODO: add email verification for new user accounts
+
 package controller
 
 import (
