@@ -19,11 +19,6 @@ type Video struct {
 	PlaylistID string        `bson:"playlist_id"`
 }
 
-// VideoID returns the video object id
-func (u *Video) VideoID() string {
-	return u.ObjectID.Hex()
-}
-
 // VideoByID gets video in a given playlist
 func VideoByID(videoID string, playlistID string) (Video, error) {
 	var err error
@@ -35,12 +30,7 @@ func VideoByID(videoID string, playlistID string) (Video, error) {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
-
-		// err = c.Find(bson.M{"$and" : [{bson.M{"playlist_id" : playlistID}}, {bson.M{"id" : videoID}]}).One(&result)
-		err = c.Find(bson.ObjectIdHex(videoID)).One(&result)
-
-		// Validate the object id
-		err = c.Find(bson.M{"user_id": videoID}).All(&result)
+		err = c.Find(bson.M{"$and": []bson.M{bson.M{"id": videoID}, bson.M{"playlist_id": playlistID}}}).One(&result)
 
 		if err != nil {
 			result = Video{}
@@ -108,9 +98,10 @@ func VideoDelete(videoID string, playlistID string) error {
 
 		var video Video
 		video, err = VideoByID(videoID, playlistID)
+
 		if err == nil {
 			// Confirm the owner is attempting to modify the note
-			if video.VideoID() == videoID {
+			if video.ID == videoID && video.PlaylistID == playlistID {
 				err = c.Remove(bson.M{"id": videoID})
 			} else {
 				err = ErrUnauthorized

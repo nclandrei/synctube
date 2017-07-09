@@ -77,7 +77,7 @@ type configuration struct {
 	Session   session.Session `json:"Session"`
 	Template  view.Template   `json:"Template"`
 	View      view.View       `json:"View"`
-	YouTube   auth.YT       `json:"YouTube"`
+	YouTube   auth.YT         `json:"YouTube"`
 }
 
 // ParseJSON unmarshals bytes to structs
