@@ -2,7 +2,6 @@ package downloader
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
 )
 
@@ -14,9 +13,12 @@ const (
 )
 
 func DownloadYouTubeVideo(url string) error {
-	fullUrl := fmt.Sprintf("%v%v", youtubePrefix, url)
-	log.Printf("THIS IS THE URL: %v", fullUrl)
-	cmd := exec.Command(youtubeDownloadCmd, extractAudio, audioFormat, fullUrl)
-	err := cmd.Run()
+	fullURL := fmt.Sprintf("%v%v", youtubePrefix, url)
+	args := []string{extractAudio, audioFormat, fullURL}
+	command := youtubeDownloadCmd
+	for _, arg := range args {
+		command += " " + arg
+	}
+	err := exec.Command("bash", "-c", command).Run()
 	return err
 }
