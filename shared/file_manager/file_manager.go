@@ -12,6 +12,8 @@ func GetZip() error {
 
 	w := zip.NewWriter(buf)
 
+
+
 	for _, file := range files {
 		f, err := w.Create(file.Name)
 		if err != nil {
