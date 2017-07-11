@@ -1,27 +1,12 @@
 {{define "title"}}YouTubeSync{{end}}
 {{define "head"}}{{end}}
 {{define "content"}}
-<!--<div class="mdl-layout__tab-panel">-->
-		<!--<h1>{{template "title" .}}</h1>-->
-	<!--<p>Click {{LINK "login" "here"}} to login.</p>-->
-	<!--{{template "footer" .}}-->
-<!--</div>-->
-
-<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
-  <div class="mdl-card__title">
-    <h2 class="mdl-card__title-text">Welcome</h2>
-  </div>
-  <div class="mdl-card__supporting-text">
-    By pressing Connect you will grant access to your public YouTube playlists.
-  </div>
-  <div class="mdl-card__actions mdl-card--border">
-    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="{{.BaseURI}}youtubeLogin">
-      Connect
-    </a>
-  </div>
-</section>
-
-{{template "footer" .}}
-
+<div class="container">
+	<div class="page-header">
+		<h1>{{template "title" .}}</h1>
+	</div>
+	<p>Click {{LINK "login" "here"}} to login.</p>
+	{{template "footer" .}}
+</div>
 {{end}}
 {{define "foot"}}{{end}}
