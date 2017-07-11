@@ -14,6 +14,7 @@ import (
 	"github.com/nclandrei/YTSync/shared/session"
 	"github.com/nclandrei/YTSync/shared/youtube/auth"
 	"github.com/nclandrei/YTSync/shared/youtube/downloader"
+	"github.com/nclandrei/ytsync/shared/file_manager"
 	"google.golang.org/api/youtube/v3"
 )
 
@@ -238,7 +239,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				}
 			}()
 		}
-		file_manager.CreateFolder(item.Snippet.Title)
+		file_manager.CreatePlaylistFolder(item.Snippet.Title)
 	}
 
 	// Finally, before redirecting to homepage, save the timestamp of the this sync

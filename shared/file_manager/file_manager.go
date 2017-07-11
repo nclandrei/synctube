@@ -3,6 +3,7 @@ package file_manager
 import (
 	"archive/zip"
 	"bytes"
+	"io/ioutil"
 	"log"
 	"os/exec"
 )
@@ -11,6 +12,12 @@ func GetZip() error {
 	buf := new(bytes.Buffer)
 
 	w := zip.NewWriter(buf)
+
+	files, err := ioutil.ReadDir("./")
+
+	if err != nil {
+		return err
+	}
 
 	for _, file := range files {
 		f, err := w.Create(file.Name)
@@ -30,7 +37,9 @@ func GetZip() error {
 	}
 }
 
-func CreateFolder(folderName string) error {
+// CreatePlaylistFolder creates a new folder with the name=playlistName
+// which will contain all songs synchronized for that user on that playlist
+func CreatePlaylistFolder(folderName string) error {
 	// firstly, create the folder with the name of the playlist with all the videos to be downloaded
 	err := exec.Command("bash", "-c", "mkdir", folderName).Run()
 	if err != nil {
