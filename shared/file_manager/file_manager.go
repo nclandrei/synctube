@@ -2,39 +2,76 @@ package file_manager
 
 import (
 	"archive/zip"
-	"bytes"
-	"io/ioutil"
+	"io"
 	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 )
 
-func GetZip() error {
-	buf := new(bytes.Buffer)
-
-	w := zip.NewWriter(buf)
-
-	files, err := ioutil.ReadDir("./")
+func GetZip(dir, target string) error {
+	zipfile, err := os.Create(target)
 
 	if err != nil {
 		return err
 	}
 
-	for _, file := range files {
-		f, err := w.Create(file.Name)
-		if err != nil {
-			log.Fatal(err)
-		}
-		_, err = f.Write([]byte(file.Body))
-		if err != nil {
-			log.Fatal(err)
-		}
+	defer zipfile.Close()
+
+	archive := zip.NewWriter(zipfile)
+	defer archive.Close()
+
+	info, err := os.Stat(dir)
+
+	if err != nil {
+		log.Fatalf("Error reading directory: %v", err.Error())
 	}
 
-	// Make sure to check the error on Close.
-	err := w.Close()
-	if err != nil {
-		log.Fatal(err)
+	var baseDir string
+	if info.IsDir() {
+		baseDir = filepath.Base(dir)
 	}
+
+	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+
+		if baseDir != "" {
+			header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, dir))
+		}
+
+		if info.IsDir() {
+			header.Name += "/"
+		} else {
+			header.Method = zip.Deflate
+		}
+
+		writer, err := archive.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		_, err = io.Copy(writer, file)
+		return err
+	})
+
+	return err
 }
 
 // CreatePlaylistFolder creates a new folder with the name=playlistName
