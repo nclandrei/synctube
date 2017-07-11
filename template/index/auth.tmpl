@@ -1,10 +1,22 @@
 {{define "title"}}YouTubeSync{{end}}
 {{define "head"}}{{end}}
 {{define "content"}}
-<div class="container">
-	<h1> Please allow us access to your public YouTube playlists! </h1>
-	<a class="waves-effect waves-light btn" href="{{.BaseURI}}youtubeLogin">Grant Access</a>
-	{{template "footer" .}}
-</div>
+
+<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+  <div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">Welcome</h2>
+  </div>
+  <div class="mdl-card__supporting-text">
+    By pressing Connect you will grant access to your public YouTube playlists.
+  </div>
+  <div class="mdl-card__actions mdl-card--border">
+    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="{{.BaseURI}}youtubeLogin">
+      Connect
+    </a>
+  </div>
+</section>
+
+{{template "footer" .}}
+
 {{end}}
 {{define "foot"}}{{end}}
