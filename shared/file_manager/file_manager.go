@@ -12,8 +12,6 @@ func GetZip() error {
 
 	w := zip.NewWriter(buf)
 
-
-
 	for _, file := range files {
 		f, err := w.Create(file.Name)
 		if err != nil {
@@ -40,6 +38,12 @@ func CreateFolder(folderName string) error {
 	}
 	// next, add all mp3s inside the folderName folder
 	err = exec.Command("bash", "-c", "mv *.mp3").Run()
+	return err
+}
+
+// CreateUserFolder creates a folder named after the user's ID that will hold the zip with synced songs
+func CreateUserFolder(userID string) error {
+	err := exec.Command("bash", "-c", "mkdir", userID).Run()
 	return err
 }
 
