@@ -1,94 +1,85 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTubeSync</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Disable tap highlight on IE -->
-  <meta name="msapplication-tap-highlight" content="no">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+	<meta name="author" content="">
 
-  <!-- Web Application Manifest -->
-  <link rel="manifest" href="manifest.json">
+	<title>{{template "title" .}}</title>
 
-  <!-- Add to homescreen for Chrome on Android -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="Web Starter Kit">
-  <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
+	<!-- Favicons from http://realfavicongenerator.net -->
+	<link rel="apple-touch-icon" sizes="57x57" href="/static/favicons/apple-touch-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/static/favicons/apple-touch-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/static/favicons/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/static/favicons/apple-touch-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="/static/favicons/apple-touch-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/static/favicons/apple-touch-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/static/favicons/apple-touch-icon-152x152.png">
+	<link rel="icon" type="image/png" href="/static/favicons/favicon-196x196.png" sizes="196x196">
+	<link rel="icon" type="image/png" href="/static/favicons/favicon-160x160.png" sizes="160x160">
+	<link rel="icon" type="image/png" href="/static/favicons/favicon-96x96.png" sizes="96x96">
+	<link rel="icon" type="image/png" href="/static/favicons/favicon-16x16.png" sizes="16x16">
+	<link rel="icon" type="image/png" href="/static/favicons/favicon-32x32.png" sizes="32x32">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-TileImage" content="/static/favicons/mstile-144x144.png">
 
-  <!-- Add to homescreen for Safari on iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Web Starter Kit">
-  <link rel="apple-touch-icon" href="images/touch/apple-touch-icon.png">
+	{{CSS "static/css/bootstrap.min.css"}}
+	{{CSS "//fonts.googleapis.com/css?family=Open+Sans:300,400,bold,italic"}}
+	{{CSS "static/css/global.css"}}
+	{{CSS "static/css/materialize.min.css"}}
 
-  <!-- Tile icon for Win8 (144x144 + tile color) -->
-  <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
-  <meta name="msapplication-TileColor" content="#2F3BA2">
 
-  <!-- Color the status bar on mobile devices -->
-  <meta name="theme-color" content="#2F3BA2">
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="//oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
+	<script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
-  <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.indigo-pink.min.css">
-
-  {{CSS "web/styles/main.css"}}
-
-  {{template "head" .}}
+	{{template "head" .}}
 </head>
-<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+<body>
 
-<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-  <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
-    <div class="mdl-layout--large-screen-only mdl-layout__header-row">
-    </div>
-    <div class="mdl-layout--large-screen-only mdl-layout__header-row">
-      <h3>YouTubeSync</h3>
-    </div>
-    <div class="mdl-layout--large-screen-only mdl-layout__header-row">
-    </div>
-    <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--primary-dark">
-      {{template "menu.tmpl" .}}
-      <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored mdl-shadow--4dp mdl-color--accent" id="add">
-        <i class="material-icons" role="presentation">add</i>
-        <span class="visuallyhidden">Add</span>
-      </button>
-    </div>
-  </header>
+<nav class="navbar navbar-static-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="{{.BaseURI}}">Go Web App</a>
+		</div>
+		<div id="navbar" class="navbar-collapse collapse">
+			{{template "menu.tmpl" .}}
+		</div>
+	</div>
+</nav>
 
-  <main class="mdl-layout__content">
-    <div class="mdl-layout__tab-panel is-active" id="overview">
-      <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
-        <header class="section__play-btn mdl-cell mdl-cell--3-col-desktop mdl-cell--2-col-tablet mdl-cell--4-col-phone mdl-color--teal-100 mdl-color-text--white">
-          <i class="material-icons">play_circle_filled</i>
-        </header>
-        <div class="mdl-card mdl-cell mdl-cell--9-col-desktop mdl-cell--6-col-tablet mdl-cell--4-col-phone">
-          <div class="mdl-card__supporting-text">
-            <h4>Features</h4>
-            Dolore ex deserunt aute fugiat aute nulla ea sunt aliqua nisi cupidatat eu. Nostrud in laboris labore nisi amet do dolor eu fugiat consectetur elit cillum esse.
-          </div>
-          <div class="mdl-card__actions">
-            <a href="#" class="mdl-button">Read our features</a>
-          </div>
-        </div>
-        <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="btn1">
-          <i class="material-icons">more_vert</i>
-        </button>
-        <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="btn1">
-          <li class="mdl-menu__item">Lorem</li>
-          <li class="mdl-menu__item" disabled>Ipsum</li>
-          <li class="mdl-menu__item">Dolor</li>
-        </ul>
-      </section>
-    </div>
-    {{template "content" .}}
-  </main>
+<input id="BaseURI" type="hidden" value="{{.BaseURI}}">
+<div id="flash-container">
+	{{range $fm := .flashes}}
+	<div id="flash-message" class="alert alert-box-fixed0 alert-box-fixed alert-dismissible {{.Class}}" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		{{.Message}}</div>
+	<!-- <div data-alert id="flash-message" class="alert-box-fixed0 alert-box-fixed {{.Class}}">{{.Message}}<a href="#" class="close">&times;</a></div> -->
+	{{end}}
 </div>
-<script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
-{{JS "web/scripts/main.js"}}
+
+{{template "content" .}}
+
+{{JS "static/js/core/jquery-3.2.1.min.js"}}
+{{JS "static/js/plugins/underscore-min.js"}}
+{{JS "static/js/core/bootstrap.min.js"}}
+{{JS "static/js/core/materialize.min.js"}}
+{{JS "static/js/global.js"}}
 
 {{template "foot" .}}
 
