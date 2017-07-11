@@ -141,7 +141,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	// Second call - will retrieve all items in user created playlists
+	// user created playlists - will retrieve all items in user created playlists
 	userCreatedPlaylistService := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
 	userCreatedPlaylists, err := userCreatedPlaylistService.Do()
 
@@ -235,6 +235,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				}
 			}()
 		}
+		file_manager.CreateFolder(item.Snippet.Title)
 	}
 
 	// Finally, before redirecting to homepage, save the timestamp of the this sync
