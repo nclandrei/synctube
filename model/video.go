@@ -18,7 +18,7 @@ type Video struct {
 	PlaylistID string        `bson:"playlist_id"`
 }
 
-// VideoByID gets video in a given playlist
+// VideoByID - gets video in a given playlist
 func VideoByID(videoID string, playlistID string) (Video, error) {
 	var err error
 
@@ -42,7 +42,7 @@ func VideoByID(videoID string, playlistID string) (Video, error) {
 	return result, standardizeError(err)
 }
 
-// VideoByPlaylistID gets all Videos for a user
+// VideoByPlaylistID - gets all Videos for a user
 func VideosByPlaylistID(playlistID string) ([]Video, error) {
 	var err error
 
@@ -60,12 +60,11 @@ func VideosByPlaylistID(playlistID string) ([]Video, error) {
 	return result, standardizeError(err)
 }
 
-// VideoCreate creates a video
+// VideoCreate - creates a video
 func VideoCreate(id string, title string, playlistID string) error {
 	var err error
 
 	if database.CheckConnection() {
-		// Create a copy of mongo
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
@@ -84,7 +83,7 @@ func VideoCreate(id string, title string, playlistID string) error {
 	return standardizeError(err)
 }
 
-// VideoDelete deletes a video
+// VideoDelete - deletes a video given its ID and the playlist it belongs to
 func VideoDelete(videoID string, playlistID string) error {
 	var err error
 
