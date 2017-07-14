@@ -85,26 +85,6 @@ func routes() *httprouter.Router {
 		New().
 		ThenFunc(controller.AboutGET)))
 
-	// Notepad
-	r.GET("/notepad", hr.Handler(alice.
-		New(acl.DisallowAnon).
-		ThenFunc(controller.NotepadReadGET)))
-	r.GET("/notepad/create", hr.Handler(alice.
-		New(acl.DisallowAnon).
-		ThenFunc(controller.NotepadCreateGET)))
-	r.POST("/notepad/create", hr.Handler(alice.
-		New(acl.DisallowAnon).
-		ThenFunc(controller.NotepadCreatePOST)))
-	r.GET("/notepad/update/:id", hr.Handler(alice.
-		New(acl.DisallowAnon).
-		ThenFunc(controller.NotepadUpdateGET)))
-	r.POST("/notepad/update/:id", hr.Handler(alice.
-		New(acl.DisallowAnon).
-		ThenFunc(controller.NotepadUpdatePOST)))
-	r.GET("/notepad/delete/:id", hr.Handler(alice.
-		New(acl.DisallowAnon).
-		ThenFunc(controller.NotepadDeleteGET)))
-
 	// goes to Google authorization so that user can grant access to auth
 	r.GET("/youtubeLogin", hr.Handler(alice.
 		New(acl.DisallowAnon).
