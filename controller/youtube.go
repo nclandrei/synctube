@@ -224,20 +224,19 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, item := range toAddVideos {
-			item := item
-			go func() {
+			go func(item *model.Video) {
 				err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
 				if err != nil {
 					log.Fatalf("Error adding the video to the database: %v", err.Error())
 				}
 				log.Printf("Added item with title '%v' to database", item.Title)
-			}()
-			go func() {
+			}(&item)
+			go func(item *model.Video) {
 				err = downloader.DownloadYouTubeVideo(item.ID)
 				if err != nil {
 					log.Fatalf("Error downloading video with ID %v from YouTube - %v", item.ID, err.Error())
 				}
-			}()
+			}(&item)
 		}
 		file_manager.CreatePlaylistFolder(item.Snippet.Title)
 	}
