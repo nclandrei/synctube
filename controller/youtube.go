@@ -11,10 +11,10 @@ import (
 	"time"
 
 	"github.com/nclandrei/YTSync/model"
+	"github.com/nclandrei/YTSync/shared/file_manager"
 	"github.com/nclandrei/YTSync/shared/session"
 	"github.com/nclandrei/YTSync/shared/youtube/auth"
 	"github.com/nclandrei/YTSync/shared/youtube/downloader"
-	"github.com/nclandrei/ytsync/shared/file_manager"
 	"google.golang.org/api/youtube/v3"
 )
 
