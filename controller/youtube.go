@@ -147,6 +147,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	// user created playlists - will retrieve all items in user created playlists
 	userCreatedPlaylistService := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
+
 	userCreatedPlaylists, err := userCreatedPlaylistService.Do()
 
 	if err != nil {
@@ -224,6 +225,9 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, item := range toAddVideos {
+			// TODO: need to test this on many downloads at once as it may throw
+			// /dev/null too many files open - maybe scale to only use a limited
+			// number of goroutines
 			go func(item *model.Video) {
 				err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
 				if err != nil {
