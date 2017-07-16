@@ -43,6 +43,10 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	// create this user's temporary folder where the zip will be created
 	file_manager.CreateUserFolder(userID)
 
+	if err != nil {
+		log.Fatalf("Error in creating the user's temporary folder: %v", err.Error())
+	}
+
 	client := auth.GetClient(context.Background(), code, userID)
 
 	service, err := youtube.New(client)
@@ -225,22 +229,15 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, item := range toAddVideos {
-			// TODO: need to test this on many downloads at once as it may throw
-			// /dev/null too many files open - maybe scale to only use a limited
-			// number of goroutines
-			go func(item *model.Video) {
-				err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
-				if err != nil {
-					log.Fatalf("Error adding the video to the database: %v", err.Error())
-				}
-				log.Printf("Added item with title '%v' to database", item.Title)
-			}(&item)
-			go func(item *model.Video) {
-				err = downloader.DownloadYouTubeVideo(item.ID)
-				if err != nil {
-					log.Fatalf("Error downloading video with ID %v from YouTube - %v", item.ID, err.Error())
-				}
-			}(&item)
+			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+			if err != nil {
+				log.Fatalf("Error adding the video to the database: %v", err.Error())
+			}
+			log.Printf("Added item with title '%v' to database", item.Title)
+			err = downloader.DownloadYouTubeVideo(item.ID)
+			if err != nil {
+				log.Fatalf("Error downloading video with ID %v from YouTube - %v", item.ID, err.Error())
+			}
 		}
 		file_manager.CreatePlaylistFolder(item.Snippet.Title)
 	}
