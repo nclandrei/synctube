@@ -89,11 +89,12 @@ func CreatePlaylistFolder(folderName string) error {
 
 // CreateUserFolder creates a folder named after the user's ID that will hold the zip with synced songs
 func CreateUserFolder(userID string) error {
-	_, err := os.Stat(userID)
-	if err == nil {
-		err = os.Mkdir(userID, os.ModeDir)
+	if _, err := os.Stat(userID); os.IsNotExist(err) {
+		os.Mkdir(userID, 0700)
+		return nil
+	} else {
+		return err
 	}
-	return err
 }
 
 //func CleanUp() error {

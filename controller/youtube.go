@@ -107,7 +107,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 				}
 
 				videos = append(videos, video)
-				log.Printf("New video with title: %v and id: %v", title, videoId)
+				log.Printf("YouTube video - (title: %v, ID: %v)", title, videoId)
 			}
 
 			// Set the token to retrieve the next page of results
@@ -226,17 +226,16 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, item := range toAddVideos {
-			go func(item *model.Video) {
-				err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
-				if err != nil {
-					log.Fatalf("Error adding the video to the database: %v", err.Error())
-				}
-				log.Printf("Added video - (title: %v, ID: %v)", item.Title, item.ID)
-				err = downloader.DownloadYouTubeVideo(item.ID)
-				if err != nil {
-					log.Fatalf("Error downloading video (title: %v, ID: %v) from YouTube - %v", item.Title, item.ID, err.Error())
-				}
-			}(&item)
+			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+			if err != nil {
+				log.Fatalf("Error adding the video to the database: %v", err.Error())
+			}
+			log.Printf("Added video - (title: %v, ID: %v)", item.Title, item.ID)
+			err = downloader.DownloadYouTubeVideo(item.ID)
+			if err != nil {
+				log.Fatalf("Error downloading video (title: %v, ID: %v) from YouTube - %v", item.Title, item.ID, err.Error())
+			}
+			log.Printf("Downloaded video - (title: %v, ID: %v)", item.Title, item.ID)
 		}
 		file_manager.CreatePlaylistFolder(item.Snippet.Title)
 	}
