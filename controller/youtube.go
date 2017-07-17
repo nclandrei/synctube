@@ -51,6 +51,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Could not retrieve client - %v", err.Error())
 	}
 
+	
 	// First call - will retrieve all items in Likes playlist;
 	// needs special call as it is a different kind of playlist
 	call := service.Channels.List("contentDetails").Mine(true)
