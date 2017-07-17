@@ -3,14 +3,14 @@ package synchronizer
 import (
 	"fmt"
 	"log"
-	"net/http"
+
+	youtube "google.golang.org/api/youtube/v3"
 
 	"github.com/nclandrei/ytsync/model"
-	youtube "google.golang.org/api/youtube/v3"
 )
 
 // DownloadLikes returns all user's liked videos given a YouTube service and the user's ID
-func DownloadLikes(userID string, client *Service) {
+func DownloadLikes(userID string, service *youtube.Service) {
 	// First call - will retrieve all items in Likes playlist;
 	// needs special call as it is a different kind of playlist
 	call := service.Channels.List("contentDetails").Mine(true)
@@ -22,7 +22,7 @@ func DownloadLikes(userID string, client *Service) {
 	}
 
 	for _, channel := range response.Items {
-		var isPlaylistNew bool
+		// var isPlaylistNew bool
 		playlistId := channel.ContentDetails.RelatedPlaylists.Likes
 
 		// Print the playlist ID for the list of uploaded videos.
@@ -31,7 +31,7 @@ func DownloadLikes(userID string, client *Service) {
 		_, err := model.PlaylistByID(playlistId, userID)
 
 		if err == model.ErrNoResult {
-			isPlaylistNew = true
+			// isPlaylistNew = true
 			err := model.PlaylistCreate(playlistId, "Likes", userID)
 			if err != nil {
 				log.Fatalf("Error creating playlist: %v", err.Error())
@@ -107,7 +107,7 @@ func DownloadLikes(userID string, client *Service) {
 	}
 }
 
-func DownloadUserPlaylistVideos(userID string, service *Service) {
+func DownloadUserPlaylistVideos(userID string, service *youtube.Service) {
 	userCreatedPlaylistService := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
 
 	userCreatedPlaylists, err := userCreatedPlaylistService.Do()
@@ -171,6 +171,7 @@ func DownloadUserPlaylistVideos(userID string, service *Service) {
 
 			fmt.Println()
 		}
+	}
 }
 
 // Function that returns the videos that are in first slice but not in the second one
