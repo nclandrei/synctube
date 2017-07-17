@@ -1,56 +1,16 @@
-package controller
+package synchronizer
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
-	"github.com/nclandrei/YTSync/model"
-	"github.com/nclandrei/YTSync/shared/file_manager"
-	"github.com/nclandrei/YTSync/shared/session"
-	"github.com/nclandrei/YTSync/shared/youtube/auth"
-	"github.com/nclandrei/YTSync/shared/youtube/downloader"
-	"google.golang.org/api/youtube/v3"
+	"github.com/nclandrei/ytsync/model"
+	youtube "google.golang.org/api/youtube/v3"
 )
 
-const (
-	oauthStateString string = "random"
-)
-
-func YouTubeGET(w http.ResponseWriter, r *http.Request) {
-	authURL := auth.GetAuthorizationURL()
-	http.Redirect(w, r, authURL, http.StatusTemporaryRedirect)
-}
-
-func YouTubePOST(w http.ResponseWriter, r *http.Request) {
-	state := r.FormValue("state")
-	sess := session.Instance(r)
-
-	if state != oauthStateString {
-		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-		return
-	}
-
-	code := r.FormValue("code")
-	userID := fmt.Sprintf("%s", sess.Values["id"])
-
-	// create this user's temporary folder where the zip will be created
-	err := file_manager.CreateUserFolder(userID)
-
-	if err != nil {
-		log.Fatalf("Error in creating the user's temporary folder: %v", err.Error())
-	}
-
-	client := auth.GetClient(context.Background(), code, userID)
-
-	service, err := youtube.New(client)
-	if err != nil {
-		log.Fatalf("Could not retrieve client - %v", err.Error())
-	}
-
+// DownloadLikes returns all user's liked videos given a YouTube service and the user's ID
+func DownloadLikes(userID string, client *Service) {
 	// First call - will retrieve all items in Likes playlist;
 	// needs special call as it is a different kind of playlist
 	call := service.Channels.List("contentDetails").Mine(true)
@@ -145,46 +105,102 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
+}
 
-	// user created playlists - will retrieve all items in user created playlists
+func DownloadUserPlaylistVideos(userID string, service *Service) {
+	userCreatedPlaylistService := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
 
-		var toAddVideos []model.Video
+	userCreatedPlaylists, err := userCreatedPlaylistService.Do()
 
-		if !isPlaylistNew {
-			storedVideos, err := model.VideosByPlaylistID(item.Id)
-			if err != nil {
-				log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
-			}
-			toAddVideos = diffPlaylistVideos(videos, storedVideos)
-			log.Printf("Number of videos to add: %v", len(toAddVideos))
-			toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
-			for _, item := range toDeleteVideos {
-				model.VideoDelete(item.ID, item.PlaylistID)
-			}
-		} else {
-			toAddVideos = videos
-		}
-
-		for _, item := range toAddVideos {
-			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
-			if err != nil {
-				log.Fatalf("Error adding the video to the database: %v", err.Error())
-			}
-			log.Printf("Added video - (title: %v, ID: %v) to database", item.Title, item.ID)
-			err = downloader.DownloadYouTubeVideo(item.ID)
-			if err != nil {
-				log.Fatalf("Error downloading video (title: %v, ID: %v) from YouTube - %v", item.Title, item.ID, err.Error())
-			}
-			log.Printf("Downloaded video - (title: %v, ID: %v)", item.Title, item.ID)
-		}
-		file_manager.CreatePlaylistFolder(item.Snippet.Title)
-	}
-
-	// Finally, before redirecting to homepage, save the timestamp of the this sync
-	err = model.UserUpdateLastSync(userID, time.Now())
 	if err != nil {
-		log.Fatalf("Error updating last sync timestamp for user: %v", err.Error())
+		log.Fatalf("Error making API call to list channels: %v", err.Error())
 	}
 
-	http.Redirect(w, r, "/", http.StatusFound)
+	for _, item := range userCreatedPlaylists.Items {
+		var isPlaylistNew bool
+
+		_, err := model.PlaylistByID(item.Id, userID)
+
+		if err == model.ErrNoResult {
+			log.Printf("Could not find playlist in database - will create a new one.")
+			isPlaylistNew = true
+			err := model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
+			if err != nil {
+				log.Fatalf("Error creating playlist: %v", err.Error())
+			}
+			log.Printf("created playlist - %v, %v", item.Snippet.Title, userID)
+		} else if err != model.ErrNoResult && err != nil {
+			log.Fatalf("Error fetching playlist from the database: %v", err.Error())
+		}
+
+		nextPageToken := ""
+		var videos []model.Video
+
+		for {
+			playlistItems := service.PlaylistItems.List("snippet,contentDetails").
+				PlaylistId(item.Id).MaxResults(50).PageToken(nextPageToken)
+
+			playlistResponse, err := playlistItems.Do()
+
+			if err != nil {
+				log.Fatalf("Error fetching playlist items: %v", err.Error())
+			}
+
+			for _, playlistItem := range playlistResponse.Items {
+				title := playlistItem.Snippet.Title
+				videoId := playlistItem.Snippet.ResourceId.VideoId
+
+				currentVideo := model.Video{
+					ID:         videoId,
+					Title:      title,
+					PlaylistID: playlistItem.Snippet.PlaylistId,
+				}
+
+				videos = append(videos, currentVideo)
+
+				log.Printf("New video with title: %v and id: %v", title, videoId)
+			}
+
+			// Set the token to retrieve the next page of results
+			// or exit the loop if all results have been retrieved.
+			nextPageToken = playlistResponse.NextPageToken
+
+			if nextPageToken == "" {
+				break
+			}
+
+			fmt.Println()
+		}
+}
+
+// Function that returns the videos that are in first slice but not in the second one
+func diffPlaylistVideos(X, Y []model.Video) []model.Video {
+	var resultSlice []model.Video
+	m := make(map[string]int)
+
+	for _, y := range Y {
+		m[y.ID]++
+	}
+
+	for _, x := range X {
+		if m[x.ID] > 0 {
+			m[x.ID]--
+			continue
+		}
+		video := getVideoByIdFromSlice(X, x.ID)
+		if video != (model.Video{}) {
+			resultSlice = append(resultSlice, x)
+		}
+	}
+
+	return resultSlice
+}
+
+func getVideoByIdFromSlice(x []model.Video, id string) model.Video {
+	for _, item := range x {
+		if item.ID == id {
+			return item
+		}
+	}
+	return model.Video{}
 }
