@@ -52,7 +52,7 @@ func Connect(d Info) {
 	}
 
 	// Prevents these errors: read tcp 127.0.0.1:27017: i/o timeout
-	Mongo.SetSocketTimeout(1 * time.Second)
+	Mongo.SetSocketTimeout(30 * time.Second)
 
 	// Check if is alive
 	if err = Mongo.Ping(); err != nil {
