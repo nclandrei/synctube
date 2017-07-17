@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+const (
+	downloadsFolderPath string = "tmp/"
+)
+
 func GetZip(dir, target string) error {
 	zipfile, err := os.Create(target)
 
@@ -89,9 +93,9 @@ func CreatePlaylistFolder(folderName string) error {
 
 // CreateUserFolder creates a folder named after the user's ID that will hold the zip with synced songs
 func CreateUserFolder(userID string) error {
-	path := "tmp/" + userID
+	path := downloadsFolderPath + userID
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.Mkdir(path, 0700)
+		os.Mkdir(downloadsFolderPath, 0700)
 		return nil
 	} else {
 		return err
