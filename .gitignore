@@ -94,6 +94,7 @@ Temporary Items
 /config/
 /vendor/
 YTSync
+synctube
 node_modules
 .tmp
 
