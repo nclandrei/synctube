@@ -10,7 +10,7 @@ import (
 )
 
 // DownloadLikes returns all user's liked videos given a YouTube service and the user's ID
-func DownloadLikes(userID string, service *youtube.Service) {
+func FetchLikes(userID string, service *youtube.Service) []model.Video {
 	// First call - will retrieve all items in Likes playlist;
 	// needs special call as it is a different kind of playlist
 	call := service.Channels.List("contentDetails").Mine(true)
@@ -21,8 +21,9 @@ func DownloadLikes(userID string, service *youtube.Service) {
 		log.Fatalf("Error making API call to list channels: %v", err.Error())
 	}
 
+	var videos []model.Video
+
 	for _, channel := range response.Items {
-		// var isPlaylistNew bool
 		playlistId := channel.ContentDetails.RelatedPlaylists.Likes
 
 		// Print the playlist ID for the list of uploaded videos.
@@ -31,18 +32,16 @@ func DownloadLikes(userID string, service *youtube.Service) {
 		_, err := model.PlaylistByID(playlistId, userID)
 
 		if err == model.ErrNoResult {
-			// isPlaylistNew = true
 			err := model.PlaylistCreate(playlistId, "Likes", userID)
 			if err != nil {
 				log.Fatalf("Error creating playlist: %v", err.Error())
 			}
-			log.Printf("Added Likes playlist for user ID %v", userID)
+			log.Printf("Created Likes playlist for user ID %v", userID)
 		} else if err != model.ErrNoResult && err != nil {
 			log.Fatalf("Error fetching Likes playlist from the database: %v", err.Error())
 		}
 
 		nextPageToken := ""
-		var videos []model.Video
 
 		for {
 			playlistCall := service.PlaylistItems.List("snippet").
@@ -79,35 +78,13 @@ func DownloadLikes(userID string, service *youtube.Service) {
 			}
 			fmt.Println()
 		}
-
-		var toAddVideos []model.Video
-
-		if !isPlaylistNew {
-			storedVideos, err := model.VideosByPlaylistID(playlistId)
-			if err != nil {
-				log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
-			}
-			toAddVideos = diffPlaylistVideos(videos, storedVideos)
-			toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
-			for _, item := range toDeleteVideos {
-				model.VideoDelete(item.ID, item.PlaylistID)
-			}
-		} else {
-			toAddVideos = videos
-		}
-
-		for _, item := range toAddVideos {
-			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
-			if err != nil {
-				log.Fatalf("Error adding the video to the database: %v", err.Error())
-			}
-			log.Printf("adding item with title '%v' to mongo", item.Title)
-		}
-
 	}
+	return videos
 }
 
-func DownloadUserPlaylistVideos(userID string, service *youtube.Service) {
+// FetchUserPlaylistVideos - returns all playlists created by a specific
+// user along with all their videos
+func FetchUserPlaylistVideos(userID string, service *youtube.Service) []model.Video {
 	userCreatedPlaylistService := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
 
 	userCreatedPlaylists, err := userCreatedPlaylistService.Do()
@@ -116,14 +93,14 @@ func DownloadUserPlaylistVideos(userID string, service *youtube.Service) {
 		log.Fatalf("Error making API call to list channels: %v", err.Error())
 	}
 
+	var videos []model.Video
+
 	for _, item := range userCreatedPlaylists.Items {
-		var isPlaylistNew bool
 
 		_, err := model.PlaylistByID(item.Id, userID)
 
 		if err == model.ErrNoResult {
 			log.Printf("Could not find playlist in database - will create a new one.")
-			isPlaylistNew = true
 			err := model.PlaylistCreate(item.Id, item.Snippet.Title, userID)
 			if err != nil {
 				log.Fatalf("Error creating playlist: %v", err.Error())
@@ -134,7 +111,6 @@ func DownloadUserPlaylistVideos(userID string, service *youtube.Service) {
 		}
 
 		nextPageToken := ""
-		var videos []model.Video
 
 		for {
 			playlistItems := service.PlaylistItems.List("snippet,contentDetails").
@@ -172,6 +148,7 @@ func DownloadUserPlaylistVideos(userID string, service *youtube.Service) {
 			fmt.Println()
 		}
 	}
+	return videos
 }
 
 // Function that returns the videos that are in first slice but not in the second one
