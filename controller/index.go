@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 
-	"github.com/nclandrei/YTSync/shared/session"
-	"github.com/nclandrei/YTSync/shared/view"
+	"github.com/nclandrei/synctube/shared/session"
+	"github.com/nclandrei/synctube/shared/view"
 )
 
 // IndexGET displays the home page

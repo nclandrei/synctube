@@ -3,7 +3,7 @@ package acl
 import (
 	"net/http"
 
-	"github.com/nclandrei/YTSync/shared/session"
+	"github.com/nclandrei/synctube/shared/session"
 )
 
 // DisallowAuth does not allow authenticated users to access the page

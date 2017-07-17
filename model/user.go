@@ -3,10 +3,10 @@ package model
 import (
 	"time"
 
-	"github.com/nclandrei/YTSync/shared/database"
+	"github.com/nclandrei/synctube/shared/database"
 
-	"gopkg.in/mgo.v2/bson"
 	"golang.org/x/oauth2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // *****************************************************************************
@@ -15,16 +15,16 @@ import (
 
 // User table contains the information for each user
 type User struct {
-	ObjectID  		bson.ObjectId  `bson:"_id"`
-	ID             	uint32         `db:"id" bson:"id,omitempty"`
-	Email     		string         `db:"email" bson:"email"`
-	Password  		string         `db:"password" bson:"password"`
-	StatusID  		uint8          `db:"status_id" bson:"status_id"`
-	Token			oauth2.Token   `db:"token" bson:"token"`
-	CreatedAt 		time.Time      `db:"created_at" bson:"created_at"`
-	UpdatedAt 		time.Time      `db:"updated_at" bson:"updated_at"`
-	Deleted   		uint8          `db:"deleted" bson:"deleted"`
-	LastSync			time.Time      `db:"last_sync" bson:"last_sync"`
+	ObjectID  bson.ObjectId `bson:"_id"`
+	ID        uint32        `db:"id" bson:"id,omitempty"`
+	Email     string        `db:"email" bson:"email"`
+	Password  string        `db:"password" bson:"password"`
+	StatusID  uint8         `db:"status_id" bson:"status_id"`
+	Token     oauth2.Token  `db:"token" bson:"token"`
+	CreatedAt time.Time     `db:"created_at" bson:"created_at"`
+	UpdatedAt time.Time     `db:"updated_at" bson:"updated_at"`
+	Deleted   uint8         `db:"deleted" bson:"deleted"`
+	LastSync  time.Time     `db:"last_sync" bson:"last_sync"`
 }
 
 // UserStatus table contains every possible user status (active/inactive)
@@ -64,7 +64,7 @@ func UpdateUserToken(userID string, token oauth2.Token) error {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("user")
-		err = c.Update(bson.M{"_id" : bson.ObjectIdHex(userID)}, bson.M{"$set" : bson.M{"token": token}})
+		err = c.Update(bson.M{"_id": bson.ObjectIdHex(userID)}, bson.M{"$set": bson.M{"token": token}})
 	} else {
 		err = ErrUnavailable
 	}
@@ -104,7 +104,7 @@ func UserCreate(email, password string) error {
 			Email:     email,
 			Password:  password,
 			StatusID:  1,
-			Token: 	   oauth2.Token{},
+			Token:     oauth2.Token{},
 			CreatedAt: now,
 			UpdatedAt: now,
 			Deleted:   0,
@@ -123,7 +123,7 @@ func UserUpdateLastSync(userID string, timestamp time.Time) error {
 		session := database.Mongo.Copy()
 		defer session.Close()
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("user")
-		err = c.Update(bson.M{"_id" : bson.ObjectIdHex(userID)}, bson.M{"$set" : bson.M{"last_sync": timestamp}})
+		err = c.Update(bson.M{"_id": bson.ObjectIdHex(userID)}, bson.M{"$set": bson.M{"last_sync": timestamp}})
 	} else {
 		err = ErrUnavailable
 	}

@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/nclandrei/YTSync/shared/database"
+	"github.com/nclandrei/synctube/shared/database"
 
 	"gopkg.in/mgo.v2/bson"
 )

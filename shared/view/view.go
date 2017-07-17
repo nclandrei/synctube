@@ -12,7 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/nclandrei/YTSync/shared/session"
+	"github.com/nclandrei/synctube/shared/session"
 )
 
 func init() {

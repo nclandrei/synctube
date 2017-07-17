@@ -5,10 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/nclandrei/YTSync/model"
-	"github.com/nclandrei/YTSync/shared/passhash"
-	"github.com/nclandrei/YTSync/shared/session"
-	"github.com/nclandrei/YTSync/shared/view"
+	"github.com/nclandrei/synctube/model"
+	"github.com/nclandrei/synctube/shared/passhash"
+	"github.com/nclandrei/synctube/shared/session"
+	"github.com/nclandrei/synctube/shared/view"
 
 	"github.com/gorilla/sessions"
 	"github.com/josephspurrier/csrfbanana"

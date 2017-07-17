@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/nclandrei/YTSync/model"
+	"github.com/nclandrei/synctube/model"
 	"golang.org/x/oauth2"
 )
 

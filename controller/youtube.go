@@ -7,11 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nclandrei/YTSync/model"
-	"github.com/nclandrei/YTSync/shared/file_manager"
-	"github.com/nclandrei/YTSync/shared/session"
-	"github.com/nclandrei/YTSync/shared/youtube/auth"
-	"github.com/nclandrei/YTSync/shared/youtube/downloader"
+	"github.com/nclandrei/synctube/model"
+	"github.com/nclandrei/synctube/shared/session"
+	"github.com/nclandrei/synctube/shared/youtube/auth"
+	"github.com/nclandrei/synctube/shared/youtube/file_manager"
 	"google.golang.org/api/youtube/v3"
 )
 
@@ -51,7 +50,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Could not retrieve client - %v", err.Error())
 	}
 
-	
 	// First call - will retrieve all items in Likes playlist;
 	// needs special call as it is a different kind of playlist
 	call := service.Channels.List("contentDetails").Mine(true)
@@ -148,38 +146,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// user created playlists - will retrieve all items in user created playlists
-
-		var toAddVideos []model.Video
-
-		if !isPlaylistNew {
-			storedVideos, err := model.VideosByPlaylistID(item.Id)
-			if err != nil {
-				log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
-			}
-			toAddVideos = diffPlaylistVideos(videos, storedVideos)
-			log.Printf("Number of videos to add: %v", len(toAddVideos))
-			toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
-			for _, item := range toDeleteVideos {
-				model.VideoDelete(item.ID, item.PlaylistID)
-			}
-		} else {
-			toAddVideos = videos
-		}
-
-		for _, item := range toAddVideos {
-			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
-			if err != nil {
-				log.Fatalf("Error adding the video to the database: %v", err.Error())
-			}
-			log.Printf("Added video - (title: %v, ID: %v) to database", item.Title, item.ID)
-			err = downloader.DownloadYouTubeVideo(item.ID)
-			if err != nil {
-				log.Fatalf("Error downloading video (title: %v, ID: %v) from YouTube - %v", item.Title, item.ID, err.Error())
-			}
-			log.Printf("Downloaded video - (title: %v, ID: %v)", item.Title, item.ID)
-		}
-		file_manager.CreatePlaylistFolder(item.Snippet.Title)
-	}
 
 	// Finally, before redirecting to homepage, save the timestamp of the this sync
 	err = model.UserUpdateLastSync(userID, time.Now())

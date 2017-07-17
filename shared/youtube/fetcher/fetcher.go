@@ -6,7 +6,7 @@ import (
 
 	youtube "google.golang.org/api/youtube/v3"
 
-	"github.com/nclandrei/ytsync/model"
+	"github.com/nclandrei/synctube/model"
 )
 
 // DownloadLikes returns all user's liked videos given a YouTube service and the user's ID
@@ -149,36 +149,4 @@ func FetchUserPlaylistVideos(userID string, service *youtube.Service) []model.Vi
 		}
 	}
 	return videos
-}
-
-// Function that returns the videos that are in first slice but not in the second one
-func diffPlaylistVideos(X, Y []model.Video) []model.Video {
-	var resultSlice []model.Video
-	m := make(map[string]int)
-
-	for _, y := range Y {
-		m[y.ID]++
-	}
-
-	for _, x := range X {
-		if m[x.ID] > 0 {
-			m[x.ID]--
-			continue
-		}
-		video := getVideoByIdFromSlice(X, x.ID)
-		if video != (model.Video{}) {
-			resultSlice = append(resultSlice, x)
-		}
-	}
-
-	return resultSlice
-}
-
-func getVideoByIdFromSlice(x []model.Video, id string) model.Video {
-	for _, item := range x {
-		if item.ID == id {
-			return item
-		}
-	}
-	return model.Video{}
 }
