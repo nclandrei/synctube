@@ -98,3 +98,8 @@ Temporary Items
 YTSync
 node_modules
 .tmp
+
+# mp3s and other parts of youtube-dl's download process
+*.mp3
+*.part
+*.webm
