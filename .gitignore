@@ -1,5 +1,3 @@
-config
-
 ### Go ###
 # Binaries for programs and plugins
 *.exe
@@ -103,3 +101,8 @@ node_modules
 *.mp3
 *.part
 *.webm
+
+# project specifics
+config
+tmp
+
