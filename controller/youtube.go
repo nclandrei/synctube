@@ -41,7 +41,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	userID := fmt.Sprintf("%s", sess.Values["id"])
 
 	// create this user's temporary folder where the zip will be created
-	file_manager.CreateUserFolder(userID)
+	err := file_manager.CreateUserFolder(userID)
 
 	if err != nil {
 		log.Fatalf("Error in creating the user's temporary folder: %v", err.Error())
@@ -51,7 +51,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	service, err := youtube.New(client)
 	if err != nil {
-		fmt.Errorf("Could not retrieve client - %v", err.Error())
+		log.Fatalf("Could not retrieve client - %v", err.Error())
 	}
 
 	// First call - will retrieve all items in Likes playlist;
@@ -229,15 +229,17 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, item := range toAddVideos {
-			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
-			if err != nil {
-				log.Fatalf("Error adding the video to the database: %v", err.Error())
-			}
-			log.Printf("Added video - (title: %v, ID: %v)", item.Title, item.ID)
-			err = downloader.DownloadYouTubeVideo(item.ID)
-			if err != nil {
-				log.Fatalf("Error downloading video with ID %v from YouTube - %v", item.ID, err.Error())
-			}
+			go func(item *model.Video) {
+				err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+				if err != nil {
+					log.Fatalf("Error adding the video to the database: %v", err.Error())
+				}
+				log.Printf("Added video - (title: %v, ID: %v)", item.Title, item.ID)
+				err = downloader.DownloadYouTubeVideo(item.ID)
+				if err != nil {
+					log.Fatalf("Error downloading video (title: %v, ID: %v) from YouTube - %v", item.Title, item.ID, err.Error())
+				}
+			}(&item)
 		}
 		file_manager.CreatePlaylistFolder(item.Snippet.Title)
 	}
