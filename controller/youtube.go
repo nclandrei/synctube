@@ -233,7 +233,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Fatalf("Error adding the video to the database: %v", err.Error())
 			}
-			log.Printf("Added item with title '%v' to database", item.Title)
+			log.Printf("Added video - (title: %v, ID: %v)", item.Title, item.ID)
 			err = downloader.DownloadYouTubeVideo(item.ID)
 			if err != nil {
 				log.Fatalf("Error downloading video with ID %v from YouTube - %v", item.ID, err.Error())
