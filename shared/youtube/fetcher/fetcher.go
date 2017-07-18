@@ -13,9 +13,13 @@ import (
 func FetchVideos(userID string, service *youtube.Service) map[string][]model.Video {
 	playlistVideosMap := make(map[string][]model.Video)
 
-	getLikesVideos()
-	getUserPlaylistVideos()
+	getLikedVideos(userID, service, playlistVideosMap)
+	getUserPlaylistVideos(userID, service, playlistVideosMap)
 
+	return playlistVideosMap
+}
+
+func getLikedVideos(userID string, service *youtube.Service, playlistVideosMap map[string][]model.Video) {
 	// First call - will retrieve all items in Likes playlist;
 	// needs special call as it is a different kind of playlist
 	call := service.Channels.List("contentDetails").Mine(true)
@@ -25,8 +29,6 @@ func FetchVideos(userID string, service *youtube.Service) map[string][]model.Vid
 		// The channels.list method call returned an error.
 		log.Fatalf("Error making API call to list channels: %v", err.Error())
 	}
-
-	var videos []model.Video
 
 	for _, channel := range likesPlaylist.Items {
 		playlistId := channel.ContentDetails.RelatedPlaylists.Likes
@@ -45,9 +47,8 @@ func FetchVideos(userID string, service *youtube.Service) map[string][]model.Vid
 		} else if err != model.ErrNoResult && err != nil {
 			log.Fatalf("Error fetching Likes playlist from the database: %v", err.Error())
 		}
-
+		getVideosFromPlaylist(service, playlistId, playlistVideosMap)
 	}
-	return videos
 }
 
 // FetchUserPlaylistVideos - returns all playlists created by a specific
@@ -60,8 +61,6 @@ func getUserPlaylistVideos(userID string, service *youtube.Service, playlistVide
 	if err != nil {
 		log.Fatalf("Error making API call to list channels: %v", err.Error())
 	}
-
-	var videos []model.Video
 
 	for _, item := range userCreatedPlaylists.Items {
 
@@ -77,49 +76,11 @@ func getUserPlaylistVideos(userID string, service *youtube.Service, playlistVide
 		} else if err != model.ErrNoResult && err != nil {
 			log.Fatalf("Error fetching playlist from the database: %v", err.Error())
 		}
-
-		nextPageToken := ""
-
-		for {
-			playlistItems := service.PlaylistItems.List("snippet,contentDetails").
-				PlaylistId(item.Id).MaxResults(50).PageToken(nextPageToken)
-
-			playlistResponse, err := playlistItems.Do()
-
-			if err != nil {
-				log.Fatalf("Error fetching playlist items: %v", err.Error())
-			}
-
-			for _, playlistItem := range playlistResponse.Items {
-				title := playlistItem.Snippet.Title
-				videoId := playlistItem.Snippet.ResourceId.VideoId
-
-				currentVideo := model.Video{
-					ID:         videoId,
-					Title:      title,
-					PlaylistID: playlistItem.Snippet.PlaylistId,
-				}
-
-				videos = append(videos, currentVideo)
-
-				log.Printf("New video with title: %v and id: %v", title, videoId)
-			}
-
-			// Set the token to retrieve the next page of results
-			// or exit the loop if all results have been retrieved.
-			nextPageToken = playlistResponse.NextPageToken
-
-			if nextPageToken == "" {
-				break
-			}
-
-			fmt.Println()
-		}
+		getVideosFromPlaylist(service, item.Id, playlistVideosMap)
 	}
-	return videos
 }
 
-func getVideosFromPlaylist(service *youtube.Service, playlistId string) []model.Video {
+func getVideosFromPlaylist(service *youtube.Service, playlistId string, playlistVideosMap map[string][]model.Video) {
 	var videos []model.Video
 	nextPageToken := ""
 
@@ -159,5 +120,5 @@ func getVideosFromPlaylist(service *youtube.Service, playlistId string) []model.
 		fmt.Println()
 	}
 
-	return videos
+	playlistVideosMap[playlistId] = videos
 }
