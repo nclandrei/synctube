@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nclandrei/SyncTube/shared/youtube/fetcher"
 	"github.com/nclandrei/synctube/model"
 	"github.com/nclandrei/synctube/shared/session"
 	"github.com/nclandrei/synctube/shared/youtube/auth"
