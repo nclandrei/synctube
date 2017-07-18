@@ -51,32 +51,33 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Could not retrieve client - %v", err.Error())
 	}
 
-	likedVideos := fetcher.FetchLikes(userID, service)
-	userPlaylistVideos := fetcher.FetchUserPlaylistVideos(userID, service)
+	videosMap := fetcher.FetchVideos(userID, service)
 
-	var toAddVideos []model.Video
+	log.Printf("map is this guy: %v", videosMap)
 
-	if !isPlaylistNew {
-		storedVideos, err := model.VideosByPlaylistID(playlistId)
-		if err != nil {
-			log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
-		}
-		toAddVideos = diffPlaylistVideos(videos, storedVideos)
-		toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
-		for _, item := range toDeleteVideos {
-			model.VideoDelete(item.ID, item.PlaylistID)
-		}
-	} else {
-		toAddVideos = videos
-	}
+	// var toAddVideos []model.Video
 
-	for _, item := range toAddVideos {
-		err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
-		if err != nil {
-			log.Fatalf("Error adding the video to the database: %v", err.Error())
-		}
-		log.Printf("adding item with title '%v' to mongo", item.Title)
-	}
+	// if !isPlaylistNew {
+	// 	storedVideos, err := model.VideosByPlaylistID(playlistId)
+	// 	if err != nil {
+	// 		log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
+	// 	}
+	// 	toAddVideos = diffPlaylistVideos(videos, storedVideos)
+	// 	toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
+	// 	for _, item := range toDeleteVideos {
+	// 		model.VideoDelete(item.ID, item.PlaylistID)
+	// 	}
+	// } else {
+	// 	toAddVideos = videos
+	// }
+
+	// for _, item := range toAddVideos {
+	// 	err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+	// 	if err != nil {
+	// 		log.Fatalf("Error adding the video to the database: %v", err.Error())
+	// 	}
+	// 	log.Printf("adding item with title '%v' to mongo", item.Title)
+	// }
 
 	// Finally, before redirecting to homepage, save the timestamp of the this sync
 	err = model.UserUpdateLastSync(userID, time.Now())
