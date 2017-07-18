@@ -11,6 +11,7 @@ import (
 	"github.com/nclandrei/synctube/model"
 	"github.com/nclandrei/synctube/shared/session"
 	"github.com/nclandrei/synctube/shared/youtube/auth"
+	"github.com/nclandrei/synctube/shared/youtube/fetcher"
 	"github.com/nclandrei/synctube/shared/youtube/file_manager"
 	"google.golang.org/api/youtube/v3"
 )
@@ -52,7 +53,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	likedVideos := fetcher.FetchLikes(userID, service)
-	userCreatedPlaylistsVideos := fetcher.FetchUserPlaylistVideos(userID, service)
+	userPlaylistVideos := fetcher.FetchUserPlaylistVideos(userID, service)
 
 	var toAddVideos []model.Video
 
@@ -77,8 +78,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("adding item with title '%v' to mongo", item.Title)
 	}
-
-	// user created playlists - will retrieve all items in user created playlists
 
 	// Finally, before redirecting to homepage, save the timestamp of the this sync
 	err = model.UserUpdateLastSync(userID, time.Now())
