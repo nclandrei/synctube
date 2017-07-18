@@ -1,40 +1,22 @@
 package main
 
-import "github.com/nclandrei/SyncTube/model"
+import (
+	"log"
 
-func DiffVideos() {
-	var toAddVideos []model.Video
+	"github.com/nclandrei/SyncTube/model"
+)
 
-	if !isPlaylistNew {
-		storedVideos, err := model.VideosByPlaylistID(item.Id)
-		if err != nil {
-			log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
-		}
-		toAddVideos = diffPlaylistVideos(videos, storedVideos)
-		log.Printf("Number of videos to add: %v", len(toAddVideos))
-		toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
-		for _, item := range toDeleteVideos {
-			model.VideoDelete(item.ID, item.PlaylistID)
-		}
-	} else {
-		toAddVideos = videos
+func DiffVideos(videos []model.Video) ([]model.Video, []model.Video) {
+	var toAddVideos, toDeleteVideos []model.Video
+
+	storedVideos, err := model.VideosByPlaylistID(item.Id)
+	if err != nil {
+		log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
 	}
-
-	for _, item := range toAddVideos {
-		err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
-		if err != nil {
-			log.Fatalf("Error adding the video to the database: %v", err.Error())
-		}
-		log.Printf("Added video - (title: %v, ID: %v) to database", item.Title, item.ID)
-		err = downloader.DownloadYouTubeVideo(item.ID)
-		if err != nil {
-			log.Fatalf("Error downloading video (title: %v, ID: %v) from YouTube - %v", item.Title, item.ID, err.Error())
-		}
-		log.Printf("Downloaded video - (title: %v, ID: %v)", item.Title, item.ID)
-	}
-	file_manager.CreatePlaylistFolder(item.Snippet.Title)
-	}
-
+	toAddVideos = diffPlaylistVideos(videos, storedVideos)
+	log.Printf("Number of videos to add: %v", len(toAddVideos))
+	toDeleteVideos = diffPlaylistVideos(storedVideos, videos)
+	return toAddVideos, toDeleteVideos
 }
 
 // Function that returns the videos that are in first slice but not in the second one
@@ -69,3 +51,18 @@ func getVideoByIdFromSlice(x []model.Video, id string) model.Video {
 	}
 	return model.Video{}
 }
+
+// for _, item := range toAddVideos {
+// err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+// if err != nil {
+// 	log.Fatalf("Error adding the video to the database: %v", err.Error())
+// }
+// 	log.Printf("Added video - (title: %v, ID: %v) to database", item.Title, item.ID)
+// 	err = downloader.DownloadYouTubeVideo(item.ID)
+// 	if err != nil {
+// 		log.Fatalf("Error downloading video (title: %v, ID: %v) from YouTube - %v", item.Title, item.ID, err.Error())
+// 	}
+// 	log.Printf("Downloaded video - (title: %v, ID: %v)", item.Title, item.ID)
+// }
+// file_manager.CreatePlaylistFolder(item.Snippet.Title)
+// }
