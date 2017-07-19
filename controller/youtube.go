@@ -59,6 +59,8 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	err = downloader.DownloadYouTubeVideos(toDownloadVideos)
 
+
+
 	// Finally, before redirecting to homepage, save the timestamp of the this sync
 	err = model.UserUpdateLastSync(userID, time.Now())
 	if err != nil {

@@ -8,13 +8,32 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/nclandrei/synctube/model"
 )
 
 const (
 	downloadsFolderPath string = "tmp/"
 )
 
-func GetZip(dir, target string) error {
+func ManageFiles(userID string, videosMap map[string][]model.Video) error {
+	// first, we create the user's folder
+	err := createUserFolder(userID)
+	if err != nil {
+		log.Fatalf("Error in creating the user's temporary folder: %v", err.Error())
+	}
+
+	// then, we create all playlist folders inside the user's one
+	for playlist, videos := range videosMap {
+		err = createPlaylistFolder(userID, playlist, videos)
+		if err != nil {
+			log.Fatalf("Error in creating the playlist with ID %v for user %v: %v", playlist, userID, err.Error())
+		}
+	}
+	return err
+}
+
+func getZip(dir, target string) error {
 	zipfile, err := os.Create(target)
 
 	if err != nil {
@@ -78,21 +97,28 @@ func GetZip(dir, target string) error {
 	return err
 }
 
-// CreatePlaylistFolder creates a new folder with the name=playlistName
+// createPlaylistFolder creates a new folder with the name=playlistName
 // which will contain all songs synchronized for that user on that playlist
-func CreatePlaylistFolder(folderName string) error {
-	// firstly, create the folder with the name of the playlist with all the videos to be downloaded
-	err := exec.Command("bash", "-c", "mkdir", folderName).Run()
+func createPlaylistFolder(userID string, playlistName string, videos []model.Video) error {
+	// first, we compute the full path of the playlist folder
+	fullPath := downloadsFolderPath + userID + "/" + playlistName
+
+	// next, create the folder with the name of the playlist with all the videos to be downloaded
+	err := exec.Command("bash", "-c", "mkdir", fullPath).Run()
 	if err != nil {
 		return err
 	}
-	// next, add all mp3s inside the folderName folder
-	err = exec.Command("bash", "-c", "mv *.mp3").Run()
+
+	for _, video := range videos {
+		// next, add all mp3s inside the folderName folder
+		err = exec.Command("bash", "-c", "mv "+video.Title+".mp3").Run()
+	}
+
 	return err
 }
 
-// CreateUserFolder creates a folder named after the user's ID that will hold the zip with synced songs
-func CreateUserFolder(userID string) error {
+// createUserFolder creates a folder named after the user's ID that will hold the zip with synced songs
+func createUserFolder(userID string) error {
 	path := downloadsFolderPath + userID
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.Mkdir(downloadsFolderPath, 0700)
