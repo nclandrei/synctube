@@ -13,7 +13,7 @@ func Synchronize(videosMap map[string][]model.Video) []model.Video {
 		if err != nil {
 			log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
 		}
-		toAddVideos = diffPlaylistVideos(videos, storedVideos)
+		toAddVideos = append(toAddVideos, diffPlaylistVideos(videos, storedVideos)...)
 		toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
 		for _, item := range toAddVideos {
 			model.VideoCreate(item.ID, item.Title, item.PlaylistID)
