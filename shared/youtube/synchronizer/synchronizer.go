@@ -6,13 +6,14 @@ import (
 	"github.com/nclandrei/synctube/model"
 )
 
-func Synchronize(videosMap map[string][]model.Video) {
+func Synchronize(videosMap map[string][]model.Video) []model.Video {
+	var toAddVideos []model.Video
 	for playlistID, videos := range videosMap {
 		storedVideos, err := model.VideosByPlaylistID(playlistID)
 		if err != nil {
 			log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
 		}
-		toAddVideos := diffPlaylistVideos(videos, storedVideos)
+		toAddVideos = diffPlaylistVideos(videos, storedVideos)
 		toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
 		for _, item := range toAddVideos {
 			model.VideoCreate(item.ID, item.Title, item.PlaylistID)
@@ -21,6 +22,7 @@ func Synchronize(videosMap map[string][]model.Video) {
 			model.VideoDelete(item.ID, item.PlaylistID)
 		}
 	}
+	return toAddVideos
 }
 
 // Function that returns the videos that are in first slice but not in the second one

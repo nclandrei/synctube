@@ -10,6 +10,7 @@ import (
 	"github.com/nclandrei/synctube/model"
 	"github.com/nclandrei/synctube/shared/session"
 	"github.com/nclandrei/synctube/shared/youtube/auth"
+	"github.com/nclandrei/synctube/shared/youtube/downloader"
 	"github.com/nclandrei/synctube/shared/youtube/fetcher"
 	"github.com/nclandrei/synctube/shared/youtube/file_manager"
 	"github.com/nclandrei/synctube/shared/youtube/synchronizer"
@@ -54,17 +55,9 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	videosMap := fetcher.FetchVideos(userID, service)
 
-	synchronizer.Synchronize(videosMap)
+	toDownloadVideos := synchronizer.Synchronize(videosMap)
 
-	// var toAddVideos []model.Video
-
-	// for _, item := range toAddVideos {
-	// 	err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
-	// 	if err != nil {
-	// 		log.Fatalf("Error adding the video to the database: %v", err.Error())
-	// 	}
-	// 	log.Printf("adding item with title '%v' to mongo", item.Title)
-	// }
+	err = downloader.DownloadYouTubeVideos(toDownloadVideos)
 
 	// Finally, before redirecting to homepage, save the timestamp of the this sync
 	err = model.UserUpdateLastSync(userID, time.Now())

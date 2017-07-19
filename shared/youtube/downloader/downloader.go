@@ -3,6 +3,8 @@ package downloader
 import (
 	"fmt"
 	"os/exec"
+
+	"github.com/nclandrei/synctube/model"
 )
 
 const (
@@ -13,13 +15,17 @@ const (
 	outputFormat       string = "--output '%(title)s.%(ext)s'"
 )
 
-func DownloadYouTubeVideo(url string) error {
-	fullURL := fmt.Sprintf("%v%v", youtubePrefix, url)
-	args := []string{extractAudio, audioFormat, outputFormat, fullURL}
-	command := youtubeDownloadCmd
-	for _, arg := range args {
-		command += " " + arg
+func DownloadYouTubeVideos(videos []model.Video) error {
+	var err error
+	for _, video := range videos {
+		fullURL := fmt.Sprintf("%v%v", youtubePrefix, video.ID)
+		args := []string{extractAudio, audioFormat, outputFormat, fullURL}
+		command := youtubeDownloadCmd
+		for _, arg := range args {
+			command += " " + arg
+		}
+		err = exec.Command("bash", "-c", command).Run()
+
 	}
-	err := exec.Command("bash", "-c", command).Run()
 	return err
 }
