@@ -59,7 +59,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	err = downloader.DownloadYouTubeVideos(toDownloadVideos)
 
-
+	err = file_manager.ManageFiles(userID, toDownloadVideosMap)
 
 	// Finally, before redirecting to homepage, save the timestamp of the this sync
 	err = model.UserUpdateLastSync(userID, time.Now())
