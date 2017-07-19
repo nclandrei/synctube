@@ -55,7 +55,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	videosMap := fetcher.FetchVideos(userID, service)
 
-	toDownloadVideos := synchronizer.Synchronize(videosMap)
+	toDownloadVideosMap := synchronizer.Synchronize(videosMap)
 
 	err = downloader.DownloadYouTubeVideos(toDownloadVideos)
 
