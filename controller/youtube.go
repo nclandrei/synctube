@@ -12,6 +12,7 @@ import (
 	"github.com/nclandrei/synctube/shared/youtube/auth"
 	"github.com/nclandrei/synctube/shared/youtube/fetcher"
 	"github.com/nclandrei/synctube/shared/youtube/file_manager"
+	"github.com/nclandrei/synctube/shared/youtube/synchronizer"
 	"google.golang.org/api/youtube/v3"
 )
 
@@ -53,23 +54,9 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	videosMap := fetcher.FetchVideos(userID, service)
 
-	log.Printf("map is this guy: %v", videosMap)
+	synchronizer.Synchronize(videosMap)
 
 	// var toAddVideos []model.Video
-
-	// if !isPlaylistNew {
-	// 	storedVideos, err := model.VideosByPlaylistID(playlistId)
-	// 	if err != nil {
-	// 		log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
-	// 	}
-	// 	toAddVideos = diffPlaylistVideos(videos, storedVideos)
-	// 	toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
-	// 	for _, item := range toDeleteVideos {
-	// 		model.VideoDelete(item.ID, item.PlaylistID)
-	// 	}
-	// } else {
-	// 	toAddVideos = videos
-	// }
 
 	// for _, item := range toAddVideos {
 	// 	err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)

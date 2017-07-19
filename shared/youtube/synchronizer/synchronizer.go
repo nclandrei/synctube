@@ -1,21 +1,26 @@
-package main
+package synchronizer
 
 import (
 	"log"
 
-	"github.com/nclandrei/SyncTube/model"
+	"github.com/nclandrei/synctube/model"
 )
 
-// DiffVideos - takes in two lists of videos, the ones fetched from YouTube and the ones that
-// reside in the database and returns two lists containing videos to be added in the DB and
-// videos that need to be deleted from storage
-func DiffVideos(dbVideos []model.Video, fetchedVideos []model.Video) ([]model.Video, []model.Video) {
-	var toAddVideos, toDeleteVideos []model.Video
-
-	toAddVideos = diffPlaylistVideos(fetchedVideos, dbVideos)
-	log.Printf("Number of videos to add: %v", len(toAddVideos))
-	toDeleteVideos = diffPlaylistVideos(dbVideos, fetchedVideos)
-	return toAddVideos, toDeleteVideos
+func Synchronize(videosMap map[string][]model.Video) {
+	for playlistID, videos := range videosMap {
+		storedVideos, err := model.VideosByPlaylistID(playlistID)
+		if err != nil {
+			log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
+		}
+		toAddVideos := diffPlaylistVideos(videos, storedVideos)
+		toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
+		for _, item := range toAddVideos {
+			model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+		}
+		for _, item := range toDeleteVideos {
+			model.VideoDelete(item.ID, item.PlaylistID)
+		}
+	}
 }
 
 // Function that returns the videos that are in first slice but not in the second one
