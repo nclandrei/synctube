@@ -16,6 +16,8 @@ const (
 	downloadsFolderPath string = "tmp/"
 )
 
+// ManageFiles, given a userID and the map of playlist-videos, will create the user's temporary folder,
+// create folders for each specific playlist and compress everything
 func ManageFiles(userID string, videosMap map[string][]model.Video) error {
 	// first, we create the user's folder
 	err := createUserFolder(userID)
@@ -30,9 +32,18 @@ func ManageFiles(userID string, videosMap map[string][]model.Video) error {
 			log.Fatalf("Error in creating the playlist with ID %v for user %v: %v", playlist, userID, err.Error())
 		}
 	}
+
+	// then the 2 paths needed for creating the archive will be constructed
+	userFolderPath := downloadsFolderPath + userID
+	zipTargetPath := downloadsFolderPath + userID + ".zip"
+
+	err = getZip(userFolderPath, zipTargetPath)
+
 	return err
 }
 
+// getZip, given a directory to compress and a target path where to put the archive, will walk
+// the directory tree recursively and compress everything
 func getZip(dir, target string) error {
 	zipfile, err := os.Create(target)
 
@@ -128,6 +139,6 @@ func createUserFolder(userID string) error {
 	}
 }
 
-//func CleanUp() error {
-//	// TODO: add code to remove zip/mp3 files after being downloaded by the user
-//}
+// func cleanUp() error {
+// 	path
+// }
