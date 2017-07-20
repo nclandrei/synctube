@@ -15,17 +15,18 @@ const (
 	outputFormat       string = "--output '%(title)s.%(ext)s'"
 )
 
-func DownloadYouTubeVideos(videos []model.Video) error {
+func DownloadYouTubeVideos(videosMap map[string][]model.Video) error {
 	var err error
-	for _, video := range videos {
-		fullURL := fmt.Sprintf("%v%v", youtubePrefix, video.ID)
-		args := []string{extractAudio, audioFormat, outputFormat, fullURL}
-		command := youtubeDownloadCmd
-		for _, arg := range args {
-			command += " " + arg
+	for _, videos := range videosMap {
+		for _, video := range videos {
+			fullURL := fmt.Sprintf("%v%v", youtubePrefix, video.ID)
+			args := []string{extractAudio, audioFormat, outputFormat, fullURL}
+			command := youtubeDownloadCmd
+			for _, arg := range args {
+				command += " " + arg
+			}
+			err = exec.Command("bash", "-c", command).Run()
 		}
-		err = exec.Command("bash", "-c", command).Run()
-
 	}
 	return err
 }

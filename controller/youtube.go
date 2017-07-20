@@ -39,13 +39,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	code := r.FormValue("code")
 	userID := fmt.Sprintf("%s", sess.Values["id"])
 
-	// create this user's temporary folder where the zip will be created
-	err := file_manager.CreateUserFolder(userID)
-
-	if err != nil {
-		log.Fatalf("Error in creating the user's temporary folder: %v", err.Error())
-	}
-
 	client := auth.GetClient(context.Background(), code, userID)
 
 	service, err := youtube.New(client)
@@ -57,7 +50,7 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 
 	toDownloadVideosMap := synchronizer.Synchronize(videosMap)
 
-	err = downloader.DownloadYouTubeVideos(toDownloadVideos)
+	err = downloader.DownloadYouTubeVideos(toDownloadVideosMap)
 
 	err = file_manager.ManageFiles(userID, toDownloadVideosMap)
 

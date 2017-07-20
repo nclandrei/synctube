@@ -9,7 +9,7 @@ import (
 // Synchronize takes a map of playlist-video arrays and returns a new map
 // containing, per playlist, all videos that need to be downloaded
 func Synchronize(videosMap map[string][]model.Video) map[string][]model.Video {
-	var toAddVideosMap map[string][]model.Video
+	toAddVideosMap := make(map[string][]model.Video)
 	for playlistID, videos := range videosMap {
 		storedVideos, err := model.VideosByPlaylistID(playlistID)
 		if err != nil {

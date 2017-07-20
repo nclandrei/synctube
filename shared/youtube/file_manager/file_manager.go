@@ -114,6 +114,8 @@ func createPlaylistFolder(userID string, playlistName string, videos []model.Vid
 	// first, we compute the full path of the playlist folder
 	fullPath := downloadsFolderPath + userID + "/" + playlistName
 
+	log.Printf("Full path is --- %v", fullPath)
+
 	// next, create the folder with the name of the playlist with all the videos to be downloaded
 	err := exec.Command("bash", "-c", "mkdir", fullPath).Run()
 	if err != nil {
