@@ -112,13 +112,17 @@ func getZip(dir, target string) error {
 // which will contain all songs synchronized for that user on that playlist
 func createPlaylistFolder(userID string, playlistName string, videos []model.Video) error {
 	// first, we compute the full path of the playlist folder
-	fullPath := downloadsFolderPath + userID + "/" + playlistName
+	path := downloadsFolderPath + userID + "/" + playlistName
 
-	log.Printf("Full path is --- %v", fullPath)
+	var err error
 
 	// next, create the folder with the name of the playlist with all the videos to be downloaded
-	err := exec.Command("bash", "-c", "mkdir", fullPath).Run()
-	if err != nil {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = os.MkdirAll(path, 0700)
+		if err != nil {
+			return err
+		}
+	} else {
 		return err
 	}
 
@@ -134,7 +138,10 @@ func createPlaylistFolder(userID string, playlistName string, videos []model.Vid
 func createUserFolder(userID string) error {
 	path := downloadsFolderPath + userID
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.Mkdir(downloadsFolderPath, 0700)
+		err = os.MkdirAll(path, 0700)
+		if err != nil {
+			return err
+		}
 		return nil
 	} else {
 		return err
