@@ -10,8 +10,8 @@ import (
 )
 
 // DownloadLikes returns all user's liked videos given a YouTube service and the user's ID
-func FetchVideos(userID string, service *youtube.Service) map[string][]model.Video {
-	playlistVideosMap := make(map[string][]model.Video)
+func FetchVideos(userID string, service *youtube.Service) map[model.Playlist][]model.Video {
+	playlistVideosMap := make(map[model.Playlist][]model.Video)
 
 	getLikedVideos(userID, service, playlistVideosMap)
 	getUserPlaylistVideos(userID, service, playlistVideosMap)
@@ -19,7 +19,7 @@ func FetchVideos(userID string, service *youtube.Service) map[string][]model.Vid
 	return playlistVideosMap
 }
 
-func getLikedVideos(userID string, service *youtube.Service, playlistVideosMap map[string][]model.Video) {
+func getLikedVideos(userID string, service *youtube.Service, playlistVideosMap map[model.Playlist][]model.Video) {
 	// First call - will retrieve all items in Likes playlist;
 	// needs special call as it is a different kind of playlist
 	call := service.Channels.List("contentDetails").Mine(true)
@@ -36,7 +36,7 @@ func getLikedVideos(userID string, service *youtube.Service, playlistVideosMap m
 		// Print the playlist ID for the list of uploaded videos.
 		fmt.Printf("Videos in list %s\r\n", playlistId)
 
-		_, err := model.PlaylistByID(playlistId, userID)
+		playlist, err := model.PlaylistByID(playlistId, userID)
 
 		if err == model.ErrNoResult {
 			err := model.PlaylistCreate(playlistId, "Likes", userID)
@@ -47,13 +47,13 @@ func getLikedVideos(userID string, service *youtube.Service, playlistVideosMap m
 		} else if err != model.ErrNoResult && err != nil {
 			log.Fatalf("Error fetching Likes playlist from the database: %v", err.Error())
 		}
-		getVideosFromPlaylist(service, playlistId, playlistVideosMap)
+		getVideosFromPlaylist(service, playlist, playlistVideosMap)
 	}
 }
 
 // FetchUserPlaylistVideos - returns all playlists created by a specific
 // user along with all their videos
-func getUserPlaylistVideos(userID string, service *youtube.Service, playlistVideosMap map[string][]model.Video) {
+func getUserPlaylistVideos(userID string, service *youtube.Service, playlistVideosMap map[model.Playlist][]model.Video) {
 	userCreatedPlaylistService := service.Playlists.List("snippet,contentDetails").Mine(true).MaxResults(25)
 
 	userCreatedPlaylists, err := userCreatedPlaylistService.Do()
@@ -64,7 +64,7 @@ func getUserPlaylistVideos(userID string, service *youtube.Service, playlistVide
 
 	for _, item := range userCreatedPlaylists.Items {
 
-		_, err := model.PlaylistByID(item.Id, userID)
+		playlist, err := model.PlaylistByID(item.Id, userID)
 
 		if err == model.ErrNoResult {
 			log.Printf("Could not find playlist in database - will create a new one.")
@@ -76,17 +76,17 @@ func getUserPlaylistVideos(userID string, service *youtube.Service, playlistVide
 		} else if err != model.ErrNoResult && err != nil {
 			log.Fatalf("Error fetching playlist from the database: %v", err.Error())
 		}
-		getVideosFromPlaylist(service, item.Id, playlistVideosMap)
+		getVideosFromPlaylist(service, playlist, playlistVideosMap)
 	}
 }
 
-func getVideosFromPlaylist(service *youtube.Service, playlistId string, playlistVideosMap map[string][]model.Video) {
+func getVideosFromPlaylist(service *youtube.Service, playlist model.Playlist, playlistVideosMap map[model.Playlist][]model.Video) {
 	var videos []model.Video
 	nextPageToken := ""
 
 	for {
 		playlistCall := service.PlaylistItems.List("snippet").
-			PlaylistId(playlistId).
+			PlaylistId(playlist.ID).
 			MaxResults(50).
 			PageToken(nextPageToken)
 
@@ -103,7 +103,7 @@ func getVideosFromPlaylist(service *youtube.Service, playlistId string, playlist
 			video := model.Video{
 				ID:         videoId,
 				Title:      title,
-				PlaylistID: playlistId,
+				PlaylistID: playlist.ID,
 			}
 
 			videos = append(videos, video)
@@ -120,5 +120,5 @@ func getVideosFromPlaylist(service *youtube.Service, playlistId string, playlist
 		fmt.Println()
 	}
 
-	playlistVideosMap[playlistId] = videos
+	playlistVideosMap[playlist] = videos
 }
