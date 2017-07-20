@@ -57,17 +57,19 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	// have been fetched and are not in the database
 	toDownloadVideosMap := synchronizer.Synchronize(videosMap)
 
-	// download all videos previously returned by the synchronizer
-	err = downloader.DownloadYouTubeVideos(toDownloadVideosMap)
+	if len(toDownloadVideosMap) != 0 {
+		// download all videos previously returned by the synchronizer
+		err = downloader.DownloadYouTubeVideos(toDownloadVideosMap)
 
-	// create temporary user and playlist folders, create zip, return it to user
-	// and, in the end, clean up everything
-	err = file_manager.ManageFiles(userID, toDownloadVideosMap)
+		// create temporary user and playlist folders, create zip, return it to user
+		// and, in the end, clean up everything
+		err = file_manager.ManageFiles(userID, toDownloadVideosMap)
 
-	// finally, before redirecting to homepage, save the timestamp of the this sync
-	err = model.UserUpdateLastSync(userID, time.Now())
-	if err != nil {
-		log.Fatalf("Error updating last sync timestamp for user: %v", err.Error())
+		// finally, before redirecting to homepage, save the timestamp of the this sync
+		err = model.UserUpdateLastSync(userID, time.Now())
+		if err != nil {
+			log.Fatalf("Error updating last sync timestamp for user: %v", err.Error())
+		}
 	}
 
 	http.Redirect(w, r, "/", http.StatusFound)
