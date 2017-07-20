@@ -8,22 +8,28 @@ import (
 
 // Synchronize takes a map of playlist-video arrays and returns a new map
 // containing, per playlist, all videos that need to be downloaded
-func Synchronize(videosMap map[string][]model.Video) map[string][]model.Video {
-	toAddVideosMap := make(map[string][]model.Video)
-	for playlistID, videos := range videosMap {
-		storedVideos, err := model.VideosByPlaylistID(playlistID)
+func Synchronize(videosMap map[model.Playlist][]model.Video) map[model.Playlist][]model.Video {
+	toAddVideosMap := make(map[model.Playlist][]model.Video)
+	for playlist, videos := range videosMap {
+		storedVideos, err := model.VideosByPlaylistID(playlist.ID)
 		if err != nil {
 			log.Fatalf("Error when retrieving all videos in playlist: %v", err.Error())
 		}
 		toAddVideos := diffPlaylistVideos(videos, storedVideos)
 		toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
 		for _, item := range toAddVideos {
-			model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+			if err != nil {
+				log.Fatalf("Error in deleting video with (ID: %v, PlaylistID: %v)", item.ID, item.PlaylistID)
+			}
 		}
 		for _, item := range toDeleteVideos {
-			model.VideoDelete(item.ID, item.PlaylistID)
+			err := model.VideoDelete(item.ID, item.PlaylistID)
+			if err != nil {
+				log.Fatalf("Error in deleting video with (ID: %v, PlaylistID: %v)", item.ID, item.PlaylistID)
+			}
 		}
-		toAddVideosMap[playlistID] = toAddVideos
+		toAddVideosMap[playlist] = toAddVideos
 	}
 	return toAddVideosMap
 }
