@@ -15,7 +15,7 @@ const (
 	outputFormat       string = "--output '%(title)s.%(ext)s'"
 )
 
-func DownloadYouTubeVideos(videosMap map[string][]model.Video) error {
+func DownloadYouTubeVideos(videosMap map[model.Playlist][]model.Video) error {
 	var err error
 	for _, videos := range videosMap {
 		for _, video := range videos {

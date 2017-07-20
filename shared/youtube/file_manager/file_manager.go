@@ -18,7 +18,7 @@ const (
 
 // ManageFiles, given a userID and the map of playlist-videos, will create the user's temporary folder,
 // create folders for each specific playlist and compress everything
-func ManageFiles(userID string, videosMap map[string][]model.Video) error {
+func ManageFiles(userID string, videosMap map[model.Playlist][]model.Video) error {
 	// first, we create the user's folder
 	err := createUserFolder(userID)
 	if err != nil {
@@ -44,6 +44,7 @@ func ManageFiles(userID string, videosMap map[string][]model.Video) error {
 
 // getZip, given a directory to compress and a target path where to put the archive, will walk
 // the directory tree recursively and compress everything
+// TODO: need to find a workaround not being able to handle errors coming from deferred functions
 func getZip(dir, target string) error {
 	zipfile, err := os.Create(target)
 
@@ -110,9 +111,9 @@ func getZip(dir, target string) error {
 
 // createPlaylistFolder creates a new folder with the name=playlistName
 // which will contain all songs synchronized for that user on that playlist
-func createPlaylistFolder(userID string, playlistName string, videos []model.Video) error {
+func createPlaylistFolder(userID string, playlist model.Playlist, videos []model.Video) error {
 	// first, we compute the full path of the playlist folder
-	path := downloadsFolderPath + userID + "/" + playlistName
+	path := downloadsFolderPath + userID + "/" + playlist.Title
 
 	var err error
 
