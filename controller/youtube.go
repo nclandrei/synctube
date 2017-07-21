@@ -30,9 +30,6 @@ func YouTubeGET(w http.ResponseWriter, r *http.Request) {
 // YouTubePOST - handles all the processing of the user's YouTube account and then returns
 // the zip containing all synced files
 func YouTubePOST(w http.ResponseWriter, r *http.Request) {
-	// redirect user back to homepage immediately
-	http.Redirect(w, r, "/", http.StatusFound)
-
 	state := r.FormValue("state")
 	sess := session.Instance(r)
 
@@ -75,6 +72,8 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.ServeFile(w, r, "tmp/"+userID)
+	http.ServeFile(w, r, "tmp/"+userID+".zip")
 
+	// redirect user back to homepage immediately
+	http.Redirect(w, r, "/", http.StatusFound)
 }
