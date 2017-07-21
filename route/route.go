@@ -88,14 +88,14 @@ func routes() *httprouter.Router {
 	// goes to Google authorization so that user can grant access to auth
 	r.GET("/youtubeLogin", hr.Handler(alice.
 		New(acl.DisallowAnon).
-		ThenFunc(controller.YouTubeGET)))
+		ThenFunc(controller.YouTubeAuthGET)))
 
-	// callback registered to handle user's info
+	// callback registered to process everything related to YouTube videos
 	r.GET("/youtubeLoginCallback", hr.Handler(alice.
 		New(acl.DisallowAnon).
-		ThenFunc(controller.YouTubePOST)))
+		ThenFunc(controller.YouTubeProcessGET)))
 
-	// callback registered to handle user's info
+	// registered to download the zip
 	r.GET("/downloadZip", hr.Handler(alice.
 		New(acl.DisallowAnon).
 		ThenFunc(controller.YouTubeDownloadZipGET)))

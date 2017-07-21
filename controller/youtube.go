@@ -22,14 +22,14 @@ const (
 )
 
 // YouTubeGET - handles getting the authorization code from Google
-func YouTubeGET(w http.ResponseWriter, r *http.Request) {
+func YouTubeAuthGET(w http.ResponseWriter, r *http.Request) {
 	authURL := auth.GetAuthorizationURL()
 	http.Redirect(w, r, authURL, http.StatusTemporaryRedirect)
 }
 
 // YouTubePOST - handles all the processing of the user's YouTube account and then returns
 // the zip containing all synced files
-func YouTubePOST(w http.ResponseWriter, r *http.Request) {
+func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
 	sess := session.Instance(r)
 
@@ -72,11 +72,14 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.ServeFile(w, r, "tmp/"+userID+".zip")
-
 	// redirect user back to homepage immediately
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/downloadZip", http.StatusFound)
 }
 
+// YouTubeDownloadZipGET - serves the zip file to the user
 func YouTubeDownloadZipGET(w http.ResponseWriter, r *http.Request) {
+	sess := session.Instance(r)
+	userID := fmt.Sprintf("%s", sess.Values["id"])
+
+	http.ServeFile(w, r, "tmp/"+userID+".zip")
 }
