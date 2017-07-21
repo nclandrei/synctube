@@ -65,15 +65,17 @@ func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 		// and, in the end, clean up everything
 		err = file_manager.ManageFiles(userID, toDownloadVideosMap)
 
-		// finally, before redirecting to homepage, save the timestamp of the this sync
-		err = model.UserUpdateLastSync(userID, time.Now())
-		if err != nil {
-			log.Fatalf("Error updating last sync timestamp for user: %v", err.Error())
-		}
+		// redirect user back to homepage immediately
+		http.Redirect(w, r, "/downloadZip", http.StatusFound)
 	}
 
-	// redirect user back to homepage immediately
-	http.Redirect(w, r, "/downloadZip", http.StatusFound)
+	// finally, before redirecting to homepage, save the timestamp of the this sync
+	err = model.UserUpdateLastSync(userID, time.Now())
+	if err != nil {
+		log.Fatalf("Error updating last sync timestamp for user: %v", err.Error())
+	}
+
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 // YouTubeDownloadZipGET - serves the zip file to the user
