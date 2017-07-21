@@ -77,3 +77,6 @@ func YouTubePOST(w http.ResponseWriter, r *http.Request) {
 	// redirect user back to homepage immediately
 	http.Redirect(w, r, "/", http.StatusFound)
 }
+
+func YouTubeDownloadZipGET(w http.ResponseWriter, r *http.Request) {
+}

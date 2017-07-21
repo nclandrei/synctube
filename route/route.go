@@ -95,6 +95,11 @@ func routes() *httprouter.Router {
 		New(acl.DisallowAnon).
 		ThenFunc(controller.YouTubePOST)))
 
+	// callback registered to handle user's info
+	r.GET("/downloadZip", hr.Handler(alice.
+		New(acl.DisallowAnon).
+		ThenFunc(controller.YouTubeDownloadZipGET)))
+
 	// Enable Pprof
 	r.GET("/debug/pprof/*pprof", hr.Handler(alice.
 		New(acl.DisallowAnon).
