@@ -68,7 +68,7 @@ func getZip(dir, target string) error {
 		baseDir = filepath.Base(dir)
 	}
 
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
