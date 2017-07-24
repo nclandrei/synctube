@@ -39,12 +39,13 @@ func ManageFiles(userID string, videosMap map[model.Playlist][]model.Video) erro
 
 	err = getZip(userFolderPath, zipTargetPath)
 
+	err = cleanUp(userID)
+
 	return err
 }
 
 // getZip, given a directory to compress and a target path where to put the archive, will walk
 // the directory tree recursively and compress everything
-// TODO: need to find a workaround not being able to handle errors coming from deferred functions
 func getZip(dir, target string) error {
 	zipfile, err := os.Create(target)
 
@@ -135,7 +136,7 @@ func createPlaylistFolder(userID string, playlist model.Playlist, videos []model
 	return err
 }
 
-// createUserFolder creates a folder named after the user's ID that will hold the zip with synced songs
+// createUserFolder - creates a folder named after the user's ID that will hold the zip with synced songs
 func createUserFolder(userID string) error {
 	path := downloadsFolderPath + userID
 	if _, err := os.Stat(path); os.IsNotExist(err) {
