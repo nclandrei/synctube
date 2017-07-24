@@ -149,6 +149,13 @@ func createUserFolder(userID string) error {
 	}
 }
 
-// func cleanUp() error {
-// 	path
-// }
+// cleanUp - cleans up inside the archive + user folder inside the temporary folder
+func cleanUp(userID string) error {
+	userFolderPath := downloadsFolderPath + userID
+	userZipPath := userFolderPath + ".zip"
+
+	err := os.RemoveAll(userFolderPath)
+	err = os.Remove(userZipPath)
+
+	return err
+}
