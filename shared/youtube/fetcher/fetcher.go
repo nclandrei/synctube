@@ -99,11 +99,13 @@ func getVideosFromPlaylist(service *youtube.Service, playlist model.Playlist, pl
 		for _, playlistItem := range playlistResponse.Items {
 			title := playlistItem.Snippet.Title
 			videoId := playlistItem.Snippet.ResourceId.VideoId
+			thumbnailURL := playlistItem.Snippet.Thumbnails.Default.Url
 
 			video := model.Video{
-				ID:         videoId,
-				Title:      title,
-				PlaylistID: playlist.ID,
+				ID:           videoId,
+				Title:        title,
+				PlaylistID:   playlist.ID,
+				ThumbnailURL: thumbnailURL,
 			}
 
 			videos = append(videos, video)

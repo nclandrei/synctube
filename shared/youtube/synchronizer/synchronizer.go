@@ -18,7 +18,7 @@ func Synchronize(videosMap map[model.Playlist][]model.Video) map[model.Playlist]
 		toAddVideos := diffPlaylistVideos(videos, storedVideos)
 		toDeleteVideos := diffPlaylistVideos(storedVideos, videos)
 		for _, item := range toAddVideos {
-			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID)
+			err := model.VideoCreate(item.ID, item.Title, item.PlaylistID, item.ThumbnailURL)
 			if err != nil {
 				log.Fatalf("Error in deleting video with (ID: %v, PlaylistID: %v)", item.ID, item.PlaylistID)
 			}

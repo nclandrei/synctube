@@ -12,10 +12,11 @@ import (
 
 // Video table contains the information for each Video per user
 type Video struct {
-	ObjectID   bson.ObjectId `bson:"_id"`
-	ID         string        `db:"id" bson:"id,omitempty"`
-	Title      string        `db:"title" bson:"title"`
-	PlaylistID string        `bson:"playlist_id"`
+	ObjectID     bson.ObjectId `bson:"_id"`
+	ID           string        `db:"id" bson:"id,omitempty"`
+	Title        string        `db:"title" bson:"title"`
+	PlaylistID   string        `bson:"playlist_id"`
+	ThumbnailURL string        `db:"thumbnail" bson:"thumbnail"`
 }
 
 // VideoByID - gets video in a given playlist
@@ -61,7 +62,7 @@ func VideosByPlaylistID(playlistID string) ([]Video, error) {
 }
 
 // VideoCreate - creates a video
-func VideoCreate(id string, title string, playlistID string) error {
+func VideoCreate(id string, title string, playlistID string, thumbnailURL string) error {
 	var err error
 
 	if database.CheckConnection() {
@@ -70,10 +71,11 @@ func VideoCreate(id string, title string, playlistID string) error {
 		c := session.DB(database.ReadConfig().MongoDB.Database).C("video")
 
 		Video := &Video{
-			ObjectID:   bson.NewObjectId(),
-			ID:         id,
-			Title:      title,
-			PlaylistID: playlistID,
+			ObjectID:     bson.NewObjectId(),
+			ID:           id,
+			Title:        title,
+			PlaylistID:   playlistID,
+			ThumbnailURL: thumbnailURL,
 		}
 		err = c.Insert(Video)
 	} else {
