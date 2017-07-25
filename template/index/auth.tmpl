@@ -7,15 +7,22 @@
       <div class="row">
       </div>
 
-      {{ range $key, $value := .toDownloadVideosMap }}
+      {{ range $playlist, $videos := .toDownloadVideosMap }}
             <div class="col s12 m6">
                   <div class="card blue-grey darken-1">
                         <div class="card-content white-text">
-                              <span class="card-title">{{ $key.Title }}</span>
-                              <ul>
-                                    <li>
-                                          <strong>{{ $key.Title }}</strong>: {{ len $value }}
+                              <span class="card-title">{{ $playlist.Title }}</span>
+                              <ul class="collection">
+                                    {{ range $video := $videos }}
+                                    <li class="collection-item-avatar">
+                                          <img src="https://camo.githubusercontent.com/98ed65187a84ecf897273d9fa18118ce45845057/68747470733a2f2f7261772e6769746875622e636f6d2f676f6c616e672d73616d706c65732f676f706865722d766563746f722f6d61737465722f676f706865722e706e67" alt="" class="circle">
+                                          <span class="title">{{ $video.Title }}</span>
+                                          <p>
+                                                {{ $video.ID }} 
+                                          </p>
+                                          <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
                                     </li>
+                                    {{ end }}
                               </ul>
                         </div>
                   </div>
