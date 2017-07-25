@@ -51,13 +51,14 @@ func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// fetch all videos from all channels for the currently logged in user
-	videosMap := fetcher.FetchVideos(userID, service)
+	fetchedVideosMap := fetcher.FetchVideos(userID, service)
 
 	// synchronize and return a playlist-videos_list map containing all videos that
 	// have been fetched and are not in the database
-	toDownloadVideosMap := synchronizer.Synchronize(videosMap)
+	toDownloadVideosMap := synchronizer.Synchronize(fetchedVideosMap)
 
-	sess.Values["videos_map"] = toDownloadVideosMap
+	sess.Values["videosMap"] = toDownloadVideosMap
+	sess.Save(r, w)
 
 	if len(toDownloadVideosMap) != 0 {
 		// download all videos previously returned by the synchronizer
@@ -68,7 +69,7 @@ func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 		err = file_manager.ManageFiles(userID, toDownloadVideosMap)
 
 		// redirect user back to homepage immediately
-		http.Redirect(w, r, "/downloadZip", http.StatusFound)
+		// http.Redirect(w, r, "/downloadZip", http.StatusFound)
 
 		// cleanup everything after zip was retrieved to user
 		// err = file_manager.CleanUp(userID)
@@ -81,6 +82,7 @@ func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusFound)
+	return
 }
 
 // YouTubeDownloadZipGET - serves the zip file to the user
