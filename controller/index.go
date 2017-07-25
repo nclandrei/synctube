@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/nclandrei/synctube/shared/session"
@@ -14,6 +15,10 @@ func IndexGET(w http.ResponseWriter, r *http.Request) {
 
 	// Display the view
 	v := view.New(r)
+
+	v.Vars["toDownloadVideosMap"] = session.Values["toDownloadVideosMap"]
+
+	log.Printf("Map is: %v", v.Vars["toDownloadVideosMap"])
 
 	if session.Values["id"] != nil {
 		v.Name = "index/auth"

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/nclandrei/synctube/model"
 	"github.com/nclandrei/synctube/shared/session"
 )
 
@@ -123,6 +124,9 @@ func New(req *http.Request) *View {
 
 	// This is required for the view to access the request
 	v.request = req
+
+	// Register map to be available as a view variable for use inside controllers
+	gob.Register(map[model.Playlist][]model.Video{})
 
 	// Get session
 	sess := session.Instance(v.request)
