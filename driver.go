@@ -48,6 +48,9 @@ func main() {
 	// Configure YouTube settings
 	auth.Configure(loadYTConfig(localConfig.YouTube))
 
+	// Initialize downloads folder for all users
+	file_manager.Init()
+
 	// Setup the views
 	view.Configure(localConfig.View)
 	view.LoadTemplates(localConfig.Template.Root, localConfig.Template.Children)

@@ -16,7 +16,14 @@ const (
 	downloadsFolderPath string = "tmp/"
 )
 
-// ManageFiles, given a userID and the map of playlist-videos, will create the user's temporary folder,
+// Init - creates the downloads folder if it doesn't exist
+func Init() {
+	if _, err := os.Stat(downloadsFolderPath); err != nil {
+		err = os.Mkdir(downloadsFolderPath, 0700)
+	}
+}
+
+// ManageFiles - given a userID and the map of playlist-videos, will create the user's temporary folder,
 // create folders for each specific playlist and compress everything
 func ManageFiles(userID string, videosMap map[model.Playlist][]model.Video) error {
 	// first, we create the user's folder
@@ -119,7 +126,7 @@ func getZip(dir, target string) error {
 	return err
 }
 
-// createPlaylistFolder creates a new folder with the name=playlistName
+// createPlaylistFolder - creates a new folder with the name=playlistName
 // which will contain all songs synchronized for that user on that playlist
 func createPlaylistFolder(userID string, playlist model.Playlist, videos []model.Video) error {
 	// first, we compute the full path of the playlist folder
