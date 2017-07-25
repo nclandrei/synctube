@@ -2,6 +2,7 @@ package downloader
 
 import (
 	"fmt"
+	"log"
 	"os/exec"
 
 	"github.com/nclandrei/synctube/model"
@@ -13,6 +14,7 @@ const (
 	extractAudio       string = "--extract-audio"
 	audioFormat        string = "--audio-format mp3"
 	outputFormat       string = "--output '%(title)s.%(ext)s'"
+	tmpFolderPath      string = "tmp/"
 )
 
 func DownloadYouTubeVideos(videosMap map[model.Playlist][]model.Video) error {
@@ -26,6 +28,7 @@ func DownloadYouTubeVideos(videosMap map[model.Playlist][]model.Video) error {
 				command += " " + arg
 			}
 			err = exec.Command("bash", "-c", command).Run()
+			log.Printf("Downloading YouTube video - (title: %v, ID: %v)", video.Title, video.ID)
 		}
 	}
 	return err
