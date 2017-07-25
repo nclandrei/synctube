@@ -57,9 +57,6 @@ func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 	// have been fetched and are not in the database
 	toDownloadVideosMap := synchronizer.Synchronize(fetchedVideosMap)
 
-	sess.Values["videosMap"] = toDownloadVideosMap
-	sess.Save(r, w)
-
 	if len(toDownloadVideosMap) != 0 {
 		// download all videos previously returned by the synchronizer
 		err = downloader.DownloadYouTubeVideos(toDownloadVideosMap)
