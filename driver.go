@@ -85,6 +85,7 @@ func (c *configuration) ParseJSON(b []byte) error {
 	return json.Unmarshal(b, &c)
 }
 
+// loadYTConfig parses the information needed for setting up YouTube
 func loadYTConfig(conf auth.YT) oauth2.Config {
 	return oauth2.Config{
 		ClientID:     conf.ClientID,
