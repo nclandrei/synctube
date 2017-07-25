@@ -16,6 +16,7 @@ import (
 	"github.com/nclandrei/synctube/shared/view"
 	"github.com/nclandrei/synctube/shared/view/plugin"
 	"github.com/nclandrei/synctube/shared/youtube/auth"
+	"github.com/nclandrei/synctube/shared/youtube/file_manager"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/youtube/v3"
 )

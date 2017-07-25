@@ -22,7 +22,12 @@
           </div>
         </div>
       </div>
-	{{template "footer" .}}
+
+      {{ range $key, $value := .toDownloadVideosMap }}
+            <li><strong>{{ $key.Title }}</strong>: {{ len $value }}</li>
+      {{ end }}
+
+      {{template "footer" .}}
 </div>
 {{end}}
 {{define "foot"}}{{end}}
