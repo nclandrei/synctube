@@ -57,6 +57,8 @@ func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 	// have been fetched and are not in the database
 	toDownloadVideosMap := synchronizer.Synchronize(videosMap)
 
+	sess.Values["videos_map"] = toDownloadVideosMap
+
 	if len(toDownloadVideosMap) != 0 {
 		// download all videos previously returned by the synchronizer
 		err = downloader.DownloadYouTubeVideos(toDownloadVideosMap)
@@ -67,6 +69,9 @@ func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 
 		// redirect user back to homepage immediately
 		http.Redirect(w, r, "/downloadZip", http.StatusFound)
+
+		// cleanup everything after zip was retrieved to user
+		// err = file_manager.CleanUp(userID)
 	}
 
 	// finally, before redirecting to homepage, save the timestamp of the this sync

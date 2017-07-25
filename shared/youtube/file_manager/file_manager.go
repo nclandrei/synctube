@@ -39,7 +39,16 @@ func ManageFiles(userID string, videosMap map[model.Playlist][]model.Video) erro
 
 	err = getZip(userFolderPath, zipTargetPath)
 
-	err = cleanUp(userID)
+	return err
+}
+
+// CleanUp - cleans up inside the archive + user folder inside the temporary folder
+func CleanUp(userID string) error {
+	userFolderPath := downloadsFolderPath + userID
+	userZipPath := userFolderPath + ".zip"
+
+	err := os.RemoveAll(userFolderPath)
+	err = os.Remove(userZipPath)
 
 	return err
 }
@@ -148,15 +157,4 @@ func createUserFolder(userID string) error {
 	} else {
 		return err
 	}
-}
-
-// cleanUp - cleans up inside the archive + user folder inside the temporary folder
-func cleanUp(userID string) error {
-	userFolderPath := downloadsFolderPath + userID
-	userZipPath := userFolderPath + ".zip"
-
-	err := os.RemoveAll(userFolderPath)
-	err = os.Remove(userZipPath)
-
-	return err
 }
