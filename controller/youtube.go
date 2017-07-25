@@ -63,7 +63,7 @@ func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 
 	if len(toDownloadVideosMap) != 0 {
 		// download all videos previously returned by the synchronizer
-		err = downloader.DownloadYouTubeVideos(toDownloadVideosMap)
+		err = downloader.DownloadYouTubeVideos(userID, toDownloadVideosMap)
 
 		// create temporary user and playlist folders, create zip, return it to user
 		// and, in the end, clean up everything
