@@ -13,22 +13,24 @@ const (
 	youtubeDownloadCmd string = "youtube-dl"
 	extractAudio       string = "--extract-audio"
 	audioFormat        string = "--audio-format mp3"
-	outputFormat       string = "--output '%(title)s.%(ext)s'"
-	tmpFolderPath      string = "tmp/"
+	tmpFolderPath      string = "tmp"
 )
 
-func DownloadYouTubeVideos(videosMap map[model.Playlist][]model.Video) error {
+// DownloadYouTubeVideos - downloads all videos in the map for a specific user
+func DownloadYouTubeVideos(userID string, videosMap map[model.Playlist][]model.Video) error {
 	var err error
-	for _, videos := range videosMap {
+	for playlist, videos := range videosMap {
 		for _, video := range videos {
+			log.Printf("Downloading YouTube video for user %v - (title: %v, ID: %v)", userID, video.Title, video.ID)
 			fullURL := fmt.Sprintf("%v%v", youtubePrefix, video.ID)
-			args := []string{extractAudio, audioFormat, outputFormat, fullURL}
+			output := fmt.Sprintf("--output '%v/%v/%v%%(title)s.%%(ext)s'", tmpFolderPath, userID, playlist.Title)
+			args := []string{extractAudio, audioFormat, output, fullURL}
 			command := youtubeDownloadCmd
 			for _, arg := range args {
 				command += " " + arg
 			}
 			err = exec.Command("bash", "-c", command).Run()
-			log.Printf("Downloading YouTube video - (title: %v, ID: %v)", video.Title, video.ID)
+			log.Printf("Downloaded YouTube video for user %v - (title: %v, ID: %v)", userID, video.Title, video.ID)
 		}
 	}
 	return err
