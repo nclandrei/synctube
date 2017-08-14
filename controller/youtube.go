@@ -70,10 +70,10 @@ func YouTubeProcessGET(w http.ResponseWriter, r *http.Request) {
 		err = file_manager.ManageFiles(userID, toDownloadVideosMap)
 
 		// redirect user back to homepage immediately
-		// http.Redirect(w, r, "/downloadZip", http.StatusFound)
+		http.Redirect(w, r, "/downloadZip", http.StatusFound)
 
 		// cleanup everything after zip was retrieved to user
-		// err = file_manager.CleanUp(userID)
+		err = file_manager.CleanUp(userID)
 	}
 
 	// finally, before redirecting to homepage, save the timestamp of the this sync
