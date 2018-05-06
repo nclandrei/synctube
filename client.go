@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
+	"google.golang.org/api/youtube/v3"
 	"net/http"
 	"net/url"
 	"os"
@@ -12,8 +13,17 @@ import (
 	"path/filepath"
 )
 
-// NewClient uses a Context and Config to retrieve a Token then generate a Client.
-func NewClient(ctx context.Context, config *oauth2.Config) (*http.Client, error) {
+// NewYTService returns a new YouTube service which communicates with the YouTube API endpoints.
+func NewYTService(ctx context.Context, config *oauth2.Config) (*youtube.Service, error) {
+	c, err := newClient(ctx, config)
+	if err != nil {
+		return nil, err
+	}
+	return youtube.New(c)
+}
+
+// newClient uses a Context and Config to retrieve a Token then generate a Client.
+func newClient(ctx context.Context, config *oauth2.Config) (*http.Client, error) {
 	cacheFile, err := tokenCacheFile()
 	if err != nil {
 		return nil, err
@@ -32,7 +42,7 @@ func NewClient(ctx context.Context, config *oauth2.Config) (*http.Client, error)
 // getTokenFromWeb uses Config to request a Token. It returns the retrieved Token.
 func getTokenFromWeb(config *oauth2.Config) (*oauth2.Token, error) {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-	fmt.Printf("Go to the following link in your browser then type the "+
+	fmt.Printf("go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
 
 	var code string
