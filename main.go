@@ -2,13 +2,34 @@ package synctube
 
 import (
 	"context"
+	"fmt"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/youtube/v3"
 	"io/ioutil"
 	"log"
+	"os"
+	"os/user"
+	"time"
 )
 
+const configFile = ".synctube"
+
+// Config defines the configuration needed to sync playlists and videos.
+type Config struct {
+	Playlists  []string  `json:"playlists"`
+	LastUpdate time.Time `json:"last_update"`
+}
+
 func main() {
+	currUser, err := user.Current()
+	if err != nil {
+		log.Fatalf("could not retrieve current user's home directory: %v\n", err)
+	}
+	f, err := os.Open(fmt.Sprintf("%s/%s", currUser.HomeDir, configFile))
+	if err != os.ErrNotExist {
+		log.Fatalf("could not open configuration file: %v\n", err)
+	}
+
 	ctx := context.Background()
 
 	b, err := ioutil.ReadFile("client_secret.json")
