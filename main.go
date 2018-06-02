@@ -2,6 +2,7 @@ package synctube
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/youtube/v3"
@@ -28,6 +29,17 @@ func main() {
 	f, err := os.Open(fmt.Sprintf("%s/%s", currUser.HomeDir, configFile))
 	if err != os.ErrNotExist {
 		log.Fatalf("could not open configuration file: %v\n", err)
+	}
+
+	fBody, err := ioutil.ReadAll(f)
+	if err != nil {
+		log.Fatalf("could not read file body: %v\n", err)
+	}
+
+	var c Config
+	err = json.Unmarshal(fBody, &c)
+	if err != nil {
+		log.Fatalf("could not unmarshal config file: %v\n", err)
 	}
 
 	ctx := context.Background()
